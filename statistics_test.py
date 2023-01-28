@@ -1,5 +1,6 @@
 import unittest
 from statistics import StatisticMethods
+import pandas as pd
 
 # create an artificial dataset to test the statistics methods
 data = [14574.49, 7606.46, 8611.41, 9175.41, 8058.65, 8105.44, 11496.28,
@@ -27,6 +28,12 @@ class TestMedian(unittest.TestCase):
 class TestMode(unittest.TestCase):
     def test_mode(self):
         self.assertEqual(stat.mode(), 8611.41)
+
+
+# test the midpoint method
+class TestMidpoint(unittest.TestCase):
+    def test_midpoint(self):
+        self.assertEqual(stat.midpoint(), 11519.98)
 
 
 # test the standard deviation
@@ -59,16 +66,41 @@ class TestCovariance(unittest.TestCase):
         self.assertEqual(stat.covariance(StatisticMethods(other)),
                          2513900.4030499994)
 
+
 # test the correlation coefficient
 class TestCorrelationCoefficient(unittest.TestCase):
     def test_correlation_coefficient(self):
         self.assertEqual(stat.correlation_coefficient(StatisticMethods(other)),
                          0.20999083362665777)
 
+
 # test the z score
 class TestZScore(unittest.TestCase):
     def test_z_score(self):
         self.assertEqual(stat.z_score(8000.0), -0.9405480672571863)
+
+
+class TestDataFrameAsInput(unittest.TestCase):
+    def test_dataframe_as_input(self):
+        df = pd.read_csv('P2-Movie-Ratings.csv')
+        stat = StatisticMethods(df)
+        assert (isinstance(stat, StatisticMethods))
+
+
+# test taking path of csv file as input
+class TestPathAsInput(unittest.TestCase):
+    def test_path_as_input(self):
+        stat = StatisticMethods('P2-Movie-Ratings.csv')
+        assert (isinstance(stat, StatisticMethods))
+
+
+# test standard deviation of dataframe
+class TestStdDevDataFrame(unittest.TestCase):
+    def test_std_dev_dataframe(self):
+        df = pd.read_csv('P2-Movie-Ratings.csv')
+        stat = StatisticMethods(df)
+        self.assertEqual(stat.standard_deviation(key="Audience Ratings %"),
+                         16.82779199386655)
 
 
 if __name__ == '__main__':
