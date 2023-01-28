@@ -65,6 +65,11 @@ class TestCorrelationCoefficient(unittest.TestCase):
         self.assertEqual(stat.correlation_coefficient(StatisticMethods(other)),
                          0.20999083362665777)
 
+# test the z score
+class TestZScore(unittest.TestCase):
+    def test_z_score(self):
+        self.assertEqual(stat.z_score(8000.0), -0.9405480672571863)
+
 
 if __name__ == '__main__':
     unittest.main()
