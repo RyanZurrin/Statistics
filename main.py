@@ -38,3 +38,9 @@ C.histogram()
 A.box_plot()
 B.box_plot()
 C.box_plot()
+
+# load the csv from statisfy\P2-Demographic-Data.csv
+D = Statify('statisfy\P2-Demographic-Data.csv')
+# D.display_data()
+D.summary()
+D.histogram(key='Birth rate')

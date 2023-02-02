@@ -41,6 +41,19 @@ class Statify(object):
             return self._data[key].mean()
         return sum(self._data) / len(self._data)
 
+    def trimmed_mean(self, key=False, percent=0.1):
+        if isinstance(self._data, pd.DataFrame):
+            return self._data[key].mean()
+        sorted_data = sorted(self._data)
+        size = len(self._data)
+        trimmed = int(size * percent)
+        return sum(sorted_data[trimmed:-trimmed]) / (size - 2 * trimmed)
+
+    def weighted_mean(self, key=False, weights=[]):
+        if isinstance(self._data, pd.DataFrame):
+            return self._data[key].mean()
+        return sum([x * y for x, y in zip(self._data, weights)]) / sum(weights)
+
     def median(self, key=False):
         if isinstance(self._data, pd.DataFrame):
             return self._data[key].median()
@@ -142,12 +155,30 @@ class Statify(object):
             return self._data[key].quantile([0, 0.25, 0.5, 0.75, 1])
         return self.Q0(), self.Q1(), self.Q2(), self.Q3(), self.Q4()
 
+    def sum_of_squares(self, key=False):
+        if isinstance(self._data, pd.DataFrame):
+            return self._data[key].sum() ** 2
+        return sum(x ** 2 for x in self._data)
+
     def display_data(self):
         if isinstance(self._data, pd.DataFrame):
             print(tabulate.tabulate(self._data, headers='keys',
                                     tablefmt='psql'))
         else:
             print(self._data)
+
+    def summary(self):
+        # print the summary of the data, if df then each column has a summary
+        if isinstance(self._data, pd.DataFrame):
+            print(self._data.describe())
+        else:
+            print('Min: ', min(self._data))
+            print('Q1: ', self.Q1())
+            print('Median: ', self.median())
+            print('Mean: ', self.mean())
+            print('Midpoint: ', self.midpoint())
+            print('Q3: ', self.Q3())
+            print('Max: ', max(self._data))
 
     def generate_data(self, size, upper_limit, lower_limit):
         # generate random data
@@ -171,6 +202,47 @@ class Statify(object):
         if display:
             plt.show()
         return box
+
+    def scatter_plot(self, other, key=False, display=True):
+        if isinstance(self._data, pd.DataFrame):
+            scatter = self._data.plot.scatter(x=key, y=other.data[key])
+        else:
+            scatter = plt.scatter(self._data, other.data)
+        if display:
+            plt.show()
+        return scatter
+
+    def line_plot(self, key=False, display=True):
+        if isinstance(self._data, pd.DataFrame):
+            line = self._data[key].plot.line()
+        else:
+            line = plt.plot(self._data)
+        if display:
+            plt.show()
+        return line
+
+    def bar_plot(self, key=False, display=True):
+        if isinstance(self._data, pd.DataFrame):
+            bar = self._data[key].plot.bar()
+        else:
+            bar = plt.bar(self._data)
+        if display:
+            plt.show()
+        return bar
+
+    def pie_plot(self, key=False, display=True):
+        if isinstance(self._data, pd.DataFrame):
+            pie = self._data[key].plot.pie()
+        else:
+            pie = plt.pie(self._data)
+        if display:
+            plt.show()
+        return pie
+
+    def frequency_table(self, key=False):
+        if isinstance(self._data, pd.DataFrame):
+            return self._data[key].value_counts()
+        return pd.Series(self._data).value_counts()
 
     @property
     def data(self):
