@@ -25,12 +25,16 @@ aces_faces = ['AH', 'AD', 'AC', 'AS', 'JH', 'JD', 'JC', 'JS', 'QH', 'QD', 'QC', 
 # print the total permutations of a deck of cards
 print(deck.permutations())
 
-people = ['A', 'B', 'C', 'M']
-positions = 2
-hired = Probabilify(people)
-odds = hired.get_sample_space(observations=positions)
-print(odds)
-print(len(odds))
+wines = ['A', 'B', 'C']
+outcome = ('?', 'A', '?')
+outcome2 = ('A', '?', '?')
+positions = 3
+rankings = Probabilify(wines)
+ss = rankings.get_sample_space(observations=positions, replacement=True, duplicates=False)
+print(ss)
+print(len(ss))
+print(rankings.probability_of_outcome(ss, outcome, keep_position=True))
+print(rankings.probability_of_outcome(ss, outcome2, keep_position=True))
 
 
 # A = Statify()

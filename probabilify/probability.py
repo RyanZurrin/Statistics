@@ -150,13 +150,18 @@ class Probabilify(Statify):
         probability = count / (len(self.data) * trials)
         return probability
 
-    def get_sample_space(self, observations, outcomes=None, replacement=False):
+    def get_sample_space(self,
+                         observations,
+                         outcomes=None,
+                         replacement=False,
+                         duplicates=True):
         """
         Calculates the sample space for a given number of observations and outcomes
 
         :param observations: the number of observations
         :param outcomes: list of possible outcomes
         :param replacement: whether the observations are taken with replacement
+        :param duplicates: whether the observations can contain duplicates
         :return: the sample space
         """
         if outcomes is None:
@@ -170,6 +175,10 @@ class Probabilify(Statify):
             sample_space = list(itertools.product(*sample_space))
         else:
             sample_space = list(itertools.combinations(outcomes, observations))
+
+        if duplicates is False:
+            sample_space = [x for x in sample_space if len(set(x)) == len(x)]
+
         return sample_space
 
     def random_sample(self, observations, outcomes=None, replacement=False):
@@ -187,47 +196,140 @@ class Probabilify(Statify):
         return sample
 
     @staticmethod
-    def probability_of_outcome(sample_space, outcome):
+    def probability_of_outcome(sample_space, outcome, keep_position=False):
         """
         Calculates the probability of a given outcome, can use ? as a wildcard in
         the outcome strings
 
         :param sample_space: the sample space
         :param outcome: the outcome
+        :param keep_position: whether to keep the position outcome
         :return: the probability of the outcome
         """
-        if str(outcome).find('?') > -1:
-            count = 0
-            index = str(outcome).find('?', 0)
-            if index > 0:
-                # get the value before the ?
-                value = str(outcome)[index - 1]
-                isValidChar = value.isalnum()
-                if not isValidChar:
+
+        if keep_position is False:
+            if str(outcome).find('?') > -1:
+                count = 0
+                index = str(outcome).find('?', 0)
+                if index > 0:
+                    # get the value before the ?
+                    value = str(outcome)[index - 1]
+                    isValidChar = value.isalnum()
+                    if not isValidChar:
+                        for sample in sample_space:
+                            # find all places variable value appears in the sample
+                            if all([x in sample for x in outcome if x != '?']):
+                                count += 1
+                    else:
+                        outcome_list = list(outcome)
+                        # remove the ? from the list
+                        for i in range(len(outcome_list)):
+                            if outcome_list[i].find('?') > -1:
+                                outcome_list[i] = outcome_list[i].replace('?', '')
+                        for sample in sample_space:
+                            if all([x in str(sample) for x in outcome_list if
+                                    x != '?']):
+                                count += 1
+
+                else:
+                    print('index <= 0')
                     for sample in sample_space:
-                        # find all places variable value appears in the sample
                         if all([x in sample for x in outcome if x != '?']):
                             count += 1
-                else:
-                    outcome_list = list(outcome)
-                    # remove the ? from the list
-                    for i in range(len(outcome_list)):
-                        if outcome_list[i].find('?') > -1:
-                            outcome_list[i] = outcome_list[i].replace('?', '')
-                    for sample in sample_space:
-                        if all([x in str(sample) for x in outcome_list if
-                                x != '?']):
-                            count += 1
-
+                # calculate the probability
+                probability = count / len(sample_space)
             else:
-                print('index <= 0')
-                for sample in sample_space:
-                    if all([x in sample for x in outcome if x != '?']):
-                        count += 1
-            # calculate the probability
-            probability = count / len(sample_space)
+                # calculate the probability
+                probability = sample_space.count(outcome) / len(sample_space)
         else:
-            # calculate the probability
-            probability = sample_space.count(outcome) / len(sample_space)
+            if str(outcome).find('?') > -1:
+                count = 0
+                index = str(outcome).find('?', 0)
+                if index > 0:
+                    # get the value before the ?
+                    value = str(outcome)[index - 1]
+                    isValidChar = value.isalnum()
+                    if not isValidChar:
+                        for sample in sample_space:
+                            flags = [False] * len(outcome)
+
+                            for i in range(len(outcome)):
+                                if outcome[i] == sample[i]:
+                                    flags[i] = True
+                                elif outcome[i] == '?':
+                                    flags[i] = True
+                                else:
+                                    flags[i] = False
+                            if all(flags):
+                                count += 1
+
+                    else:
+                        outcome_list = list(outcome)
+                        # remove the ? from the list
+                        for i in range(len(outcome_list)):
+                            if outcome_list[i].find('?') > -1:
+                                outcome_list[i] = outcome_list[i].replace('?', '')
+                        for sample in sample_space:
+                            if all([x in str(sample) for x in outcome_list if
+                                    x != '?']):
+                                count += 1
+
+                else:
+                    for sample in sample_space:
+                        if all([x in sample for x in outcome if x != '?']):
+                            count += 1
+                # calculate the probability
+                probability = count / len(sample_space)
+            else:
+                # calculate the probability
+                probability = sample_space.count(outcome) / len(sample_space)
+
+
         return probability
 
+    #
+    # @staticmethod
+    # def probability_of_outcome(sample_space, outcome):
+    #     """
+    #     Calculates the probability of a given outcome, can use ? as a wildcard in
+    #     the outcome strings
+    #
+    #     :param sample_space: the sample space
+    #     :param outcome: the outcome
+    #     :return: the probability of the outcome
+    #     """
+    #     if str(outcome).find('?') > -1:
+    #         count = 0
+    #         index = str(outcome).find('?', 0)
+    #         if index > 0:
+    #             # get the value before the ?
+    #             value = str(outcome)[index - 1]
+    #             isValidChar = value.isalnum()
+    #             if not isValidChar:
+    #                 for sample in sample_space:
+    #                     # find all places variable value appears in the sample
+    #                     if all([x in sample for x in outcome if x != '?']):
+    #                         count += 1
+    #             else:
+    #                 outcome_list = list(outcome)
+    #                 # remove the ? from the list
+    #                 for i in range(len(outcome_list)):
+    #                     if outcome_list[i].find('?') > -1:
+    #                         outcome_list[i] = outcome_list[i].replace('?', '')
+    #                 for sample in sample_space:
+    #                     if all([x in str(sample) for x in outcome_list if
+    #                             x != '?']):
+    #                         count += 1
+    #
+    #         else:
+    #             print('index <= 0')
+    #             for sample in sample_space:
+    #                 if all([x in sample for x in outcome if x != '?']):
+    #                     count += 1
+    #         # calculate the probability
+    #         probability = count / len(sample_space)
+    #     else:
+    #         # calculate the probability
+    #         probability = sample_space.count(outcome) / len(sample_space)
+    #
+    #     return probability
