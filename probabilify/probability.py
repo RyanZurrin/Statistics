@@ -1,4 +1,5 @@
 import itertools
+import random
 from itertools import combinations
 from statistics import *
 
@@ -43,7 +44,7 @@ class Probabilify(Statify):
     def factorial(self, n):
         """
         Calculates the factorial of a number
-        :param n: the number
+        :param n: the number to be factored
         :return: the factorial of the number
         """
         # calculate the factorial
@@ -82,10 +83,10 @@ class Probabilify(Statify):
         if not isinstance(values, list):
             values = [values]
         # calculate the number of combinations
-        combinations = 1
+        combos = 1
         for value in values:
-            combinations *= self.data.count(value)
-        return combinations
+            combos *= self.data.count(value)
+        return combos
 
     def nCp(self, n, p):
         """
@@ -95,9 +96,9 @@ class Probabilify(Statify):
         :return: the number of combinations
         """
         # calculate the number of combinations
-        combinations = self.factorial(n) / (
+        combos = self.factorial(n) / (
                 self.factorial(p) * self.factorial(n - p))
-        return combinations
+        return combos
 
     def nCp_with_replacement(self, n, p):
         """
@@ -107,9 +108,9 @@ class Probabilify(Statify):
         :return: the number of combinations
         """
         # calculate the number of combinations
-        combinations = self.factorial(n + p - 1) / (
+        combos = self.factorial(n + p - 1) / (
                 self.factorial(p) * self.factorial(n - 1))
-        return combinations
+        return combos
 
     def nPr(self, n, p):
         """
@@ -122,7 +123,7 @@ class Probabilify(Statify):
         permutations = self.factorial(n) / self.factorial(n - p)
         return permutations
 
-    def nPr_with_replacement(n, p):
+    def nPr_with_replacement(self, n, p):
         """
         Calculates the number of permutations of n things taken p at a time with replacement
         :param n: the number of things
@@ -136,8 +137,9 @@ class Probabilify(Statify):
     # method to return the probability of a given value
     def probability(self, value, trials=1):
         """
-        CaLculates the probablity a value or set of values will be picked  from
+        CaCalculates the probability a value or set of values will be picked  from
         the data set over a given number of trials
+
         :param value:  the value or set of values to be picked
         :param trials: the number of trials to be run
         :return: the probability of the value or set of values being picked
@@ -151,27 +153,12 @@ class Probabilify(Statify):
     def get_sample_space(self, observations, outcomes=None, replacement=False):
         """
         Calculates the sample space for a given number of observations and outcomes
-        :param replacement:
-        :param outcomes: list of possible outcomes
+
         :param observations: the number of observations
+        :param outcomes: list of possible outcomes
+        :param replacement: whether the observations are taken with replacement
         :return: the sample space
         """
-        #
-        # Example:
-        # Consider a situation where cars entering an intersection each could turn
-        # right, turn left, or go straight.
-        # An experiment consists of observing two vehicles moving through the intersection.
-        # How many sample points are there in the sample space?
-        # There are 3 possible outcomes for the first car and 3 possible outcomes for the second car.
-        # The sample space is the set of all possible outcomes for the experiment.
-        # The sample space for this experiment is {(right, right), (right, left), (right, straight),
-        # (left, right), (left, left), (left, straight), (straight, right), (straight, left),
-        # (straight, straight)}.
-        # There are 9 sample points in the sample space.
-
-        # get the sample space: given outcomes of 'L', 'R', 'S' and 2 observations, the sample space is
-        # [('L', 'L'), ('L', 'R'), ('L', 'S'), ('R', 'L'), ('R', 'R'), ('R', 'S'), ('S', 'L'), ('S', 'R'), ('S', 'S')]
-        # if replacement is True, the sample space is
         if outcomes is None:
             outcomes = self.data
 
@@ -185,17 +172,62 @@ class Probabilify(Statify):
             sample_space = list(itertools.combinations(outcomes, observations))
         return sample_space
 
-        # if replacement:
-        #     sample_space = list(itertools.combinations(outcomes, observations))
-        # else:
-        #     sample_space = list(
-        #         itertools.product(outcomes, repeat=observations))
-        #
-        # return sample_space
+    def random_sample(self, observations, outcomes=None, replacement=False):
+        """
+        Returns a random sample from the sample space
 
-    # for i in range(observations):
-    #     sample_space.append(outcomes)
-    # sample_space = list(itertools.product(*sample_space))
-    # # remove duplicates
-    # sample_space = list(set(sample_space))
-    # return sample_space
+        :param observations: the number of observations
+        :param outcomes: list of possible outcomes
+        :param replacement: whether the observations are taken with replacement
+        :return: the sample space
+        """
+        sample_space = self.get_sample_space(observations, outcomes,
+                                             replacement)
+        sample = random.choice(sample_space)
+        return sample
+
+    @staticmethod
+    def probability_of_outcome(sample_space, outcome):
+        """
+        Calculates the probability of a given outcome, can use ? as a wildcard in
+        the outcome strings
+
+        :param sample_space: the sample space
+        :param outcome: the outcome
+        :return: the probability of the outcome
+        """
+        if str(outcome).find('?') > -1:
+            count = 0
+            index = str(outcome).find('?', 0)
+            if index > 0:
+                # get the value before the ?
+                value = str(outcome)[index - 1]
+                isValidChar = value.isalnum()
+                if not isValidChar:
+                    for sample in sample_space:
+                        # find all places variable value appears in the sample
+                        if all([x in sample for x in outcome if x != '?']):
+                            count += 1
+                else:
+                    outcome_list = list(outcome)
+                    # remove the ? from the list
+                    for i in range(len(outcome_list)):
+                        if outcome_list[i].find('?') > -1:
+                            outcome_list[i] = outcome_list[i].replace('?', '')
+                    for sample in sample_space:
+                        if all([x in str(sample) for x in outcome_list if
+                                x != '?']):
+                            count += 1
+
+            else:
+                print('index <= 0')
+                for sample in sample_space:
+                    if all([x in sample for x in outcome if x != '?']):
+                        count += 1
+            # calculate the probability
+            probability = count / len(sample_space)
+        else:
+            # calculate the probability
+            probability = sample_space.count(outcome) / len(sample_space)
+        return probability
+
