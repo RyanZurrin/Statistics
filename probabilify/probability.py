@@ -1,4 +1,5 @@
 import itertools
+import pprint
 import random
 from itertools import combinations
 from statistics import *
@@ -134,6 +135,22 @@ class Probabilify(Statify):
         permutations = n ** p
         return permutations
 
+    def nPn(self, n: list, p):
+        """
+        the number of ways of partitioning  n distinct objects into k distinct
+        groups containing n_1, n_2, ..., n_k objects respectively, where each
+        object appears in exactly one group. N = n! / (n_1! * n_2! * ... * n_k!)
+        :param n:  the number of objects
+        :param p:  the number of groups
+        :return:  the number of ways of partitioning n objects into k groups
+        """
+        # calculate the number of ways of partitioning n objects into k groups
+        denominator = 1
+        for i in n:
+            denominator *= self.factorial(i)
+        permutations = self.factorial(sum(n)) / denominator
+        return permutations
+
     # method to return the probability of a given value
     def probability(self, value, trials=1):
         """
@@ -154,7 +171,8 @@ class Probabilify(Statify):
                          observations,
                          outcomes=None,
                          replacement=False,
-                         duplicates=True):
+                         duplicates=True,
+                         display=True):
         """
         Calculates the sample space for a given number of observations and outcomes
 
@@ -162,6 +180,7 @@ class Probabilify(Statify):
         :param outcomes: list of possible outcomes
         :param replacement: whether the observations are taken with replacement
         :param duplicates: whether the observations can contain duplicates
+        :param display: whether to display the sample space
         :return: the sample space
         """
         if outcomes is None:
@@ -178,6 +197,13 @@ class Probabilify(Statify):
 
         if duplicates is False:
             sample_space = [x for x in sample_space if len(set(x)) == len(x)]
+
+        if display:
+            # add a new line every 10 items
+            for i in range(0, len(sample_space), 10):
+                print(sample_space[i:i + 10])
+            # print the total number of outcomes
+            print(f'Cardinality of sample space S is : {len(sample_space)}')
 
         return sample_space
 
@@ -196,7 +222,7 @@ class Probabilify(Statify):
         return sample
 
     @staticmethod
-    def probability_of_outcome(sample_space, outcome, keep_position=False):
+    def __probability_of_outcome(sample_space, outcome, keep_position=False):
         """
         Calculates the probability of a given outcome, can use ? as a wildcard in
         the outcome strings
@@ -206,7 +232,6 @@ class Probabilify(Statify):
         :param keep_position: whether to keep the position outcome
         :return: the probability of the outcome
         """
-
         if keep_position is False:
             if str(outcome).find('?') > -1:
                 count = 0
@@ -225,7 +250,8 @@ class Probabilify(Statify):
                         # remove the ? from the list
                         for i in range(len(outcome_list)):
                             if outcome_list[i].find('?') > -1:
-                                outcome_list[i] = outcome_list[i].replace('?', '')
+                                outcome_list[i] = outcome_list[i].replace('?',
+                                                                          '')
                         for sample in sample_space:
                             if all([x in str(sample) for x in outcome_list if
                                     x != '?']):
@@ -268,7 +294,8 @@ class Probabilify(Statify):
                         # remove the ? from the list
                         for i in range(len(outcome_list)):
                             if outcome_list[i].find('?') > -1:
-                                outcome_list[i] = outcome_list[i].replace('?', '')
+                                outcome_list[i] = outcome_list[i].replace('?',
+                                                                          '')
                         for sample in sample_space:
                             if all([x in str(sample) for x in outcome_list if
                                     x != '?']):
@@ -283,53 +310,32 @@ class Probabilify(Statify):
             else:
                 # calculate the probability
                 probability = sample_space.count(outcome) / len(sample_space)
-
-
         return probability
 
-    #
-    # @staticmethod
-    # def probability_of_outcome(sample_space, outcome):
-    #     """
-    #     Calculates the probability of a given outcome, can use ? as a wildcard in
-    #     the outcome strings
-    #
-    #     :param sample_space: the sample space
-    #     :param outcome: the outcome
-    #     :return: the probability of the outcome
-    #     """
-    #     if str(outcome).find('?') > -1:
-    #         count = 0
-    #         index = str(outcome).find('?', 0)
-    #         if index > 0:
-    #             # get the value before the ?
-    #             value = str(outcome)[index - 1]
-    #             isValidChar = value.isalnum()
-    #             if not isValidChar:
-    #                 for sample in sample_space:
-    #                     # find all places variable value appears in the sample
-    #                     if all([x in sample for x in outcome if x != '?']):
-    #                         count += 1
-    #             else:
-    #                 outcome_list = list(outcome)
-    #                 # remove the ? from the list
-    #                 for i in range(len(outcome_list)):
-    #                     if outcome_list[i].find('?') > -1:
-    #                         outcome_list[i] = outcome_list[i].replace('?', '')
-    #                 for sample in sample_space:
-    #                     if all([x in str(sample) for x in outcome_list if
-    #                             x != '?']):
-    #                         count += 1
-    #
-    #         else:
-    #             print('index <= 0')
-    #             for sample in sample_space:
-    #                 if all([x in sample for x in outcome if x != '?']):
-    #                     count += 1
-    #         # calculate the probability
-    #         probability = count / len(sample_space)
-    #     else:
-    #         # calculate the probability
-    #         probability = sample_space.count(outcome) / len(sample_space)
-    #
-    #     return probability
+    def probability_of_outcomes(self,
+                                sample_space,
+                                outcome,
+                                keep_position=False,
+                                display=True):
+        """
+        Calculates the probability of a given outcomes, can use ? as a wildcard in
+        the outcome strings
+        :param sample_space: the sample space
+        :param outcome:  the outcome
+        :param keep_position:  whether to keep the position outcome
+        :param display: whether to display the probability
+        :return:  the probability of the outcome
+        """
+        if isinstance(outcome, list):
+            probability = 0
+            for out in outcome:
+                probability += self.__probability_of_outcome(sample_space, out,
+                                                             keep_position)
+        else:
+            probability = self.__probability_of_outcome(sample_space, outcome,
+                                                        keep_position)
+
+        if display:
+            print(f'Probability of {outcome} is {probability}')
+        return probability
+
