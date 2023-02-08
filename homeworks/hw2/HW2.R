@@ -1,6 +1,8 @@
-## Import the COVID data
+## Import the COVID dat
+getwd()
+setwd("D:/src/python/Statistics/homeworks/hw2")
 covid <- read.table("world-covid-2023-02-03.txt", sep = "\t", comment.char = "", header = TRUE,
-	na.strings = c("N/A ", ""))
+					na.strings = c("N/A ", ""))
 
 str(covid)
 
@@ -11,6 +13,7 @@ covid$Country <- trimws(covid$Country)
 
 covid <- covid[,-1]
 str(covid)
+dim(covid)
 head(covid)
 tail(covid)
 
@@ -58,4 +61,22 @@ hist(log10(covid$Tests.1M.pop))
 # these two histograms are very different looking. The first histogram is skewed
 # to the right big time while the second histogram is more normal looking but just
 # a little skewed to the left.
+
+# which country  has the highest ratio of active cases over popultation size?
+# HINT: divide the first corresponding column by the second and use which.max
+# to find the index of the maximum value
+str(covid)
+covid$Active.Cases
+covid$Population
+covid$Active.Cases/covid$Population
+which.max(covid$Active.Cases/covid$Population)
+var = covid[which.max(covid$Active.Cases/covid$Population),]
+ggplot(data=covid) + aes(x=Active.Cases, y=Population) + geom_point()
+filter = covid$Active.Cases/covid$Population
+filter
+# add color to the plot and size based on the number of tests per million people
+gp = ggplot(data=covid) + aes(x=Active.Cases, y=Population, color=Country, size=filter) + geom_point()
+# add log scale to the x and y axis
+gp = gp + scale_x_log10() + scale_y_log10()
+gp
 

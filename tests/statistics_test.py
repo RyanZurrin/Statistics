@@ -1,5 +1,9 @@
 import unittest
-from statisfy import Statify
+# append the parent directory to the path
+# append the parent directory to the path
+import sys, os
+sys.path.append(os.path.realpath((os.path.dirname(__file__) + '/../')))
+from src.statify import Statify
 import pandas as pd
 
 # create an artificial dataset to test the statistics methods
@@ -82,7 +86,7 @@ class TestZScore(unittest.TestCase):
 
 class TestDataFrameAsInput(unittest.TestCase):
     def test_dataframe_as_input(self):
-        df = pd.read_csv('P2-Movie-Ratings.csv')
+        df = pd.read_csv('D:/src/python/Statistics/tests/P2-Movie-Ratings.csv')
         stat = Statify(df)
         assert (isinstance(stat, Statify))
 
@@ -90,14 +94,14 @@ class TestDataFrameAsInput(unittest.TestCase):
 # test taking path of csv file as input
 class TestPathAsInput(unittest.TestCase):
     def test_path_as_input(self):
-        stat = Statify('P2-Movie-Ratings.csv')
+        stat = Statify('D:/src/python/Statistics/tests/P2-Movie-Ratings.csv')
         assert (isinstance(stat, Statify))
 
 
 # test standard deviation of dataframe
 class TestStdDevDataFrame(unittest.TestCase):
     def test_std_dev_dataframe(self):
-        df = pd.read_csv('P2-Movie-Ratings.csv')
+        df = pd.read_csv('D:/src/python/Statistics/tests/P2-Movie-Ratings.csv')
         stat = Statify(df)
         self.assertEqual(stat.standard_deviation(key="Audience Ratings %"),
                          16.82779199386655)

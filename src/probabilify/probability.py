@@ -1,12 +1,7 @@
 import itertools
-import pprint
 import random
-from itertools import combinations
-from statistics import *
 
-from statisfy import Statify
-import tensorflow as tf
-import tensorflow_probability as tfp
+from src.statify import Statify
 
 
 # class to turn data into a probability object, given a data set
@@ -42,7 +37,8 @@ class Probabilify(Statify):
             count += self.data.count(value)
         return count
 
-    def factorial(self, n):
+    @staticmethod
+    def factorial(n):
         """
         Calculates the factorial of a number
         :param n: the number to be factored
