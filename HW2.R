@@ -58,3 +58,4 @@ hist(log10(covid$Tests.1M.pop))
 # these two histograms are very different looking. The first histogram is skewed
 # to the right big time while the second histogram is more normal looking but just
 # a little skewed to the left.
+

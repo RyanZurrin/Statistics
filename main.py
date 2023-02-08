@@ -2,6 +2,30 @@ from pprint import pprint
 
 from statisfy import Statify
 from probabilify import Probabilify
+from rpy2 import robjects
+
+import rpy2.robjects.packages as rpackages
+from rpy2.robjects.packages import importr, data
+import rpy2.robjects.lib.ggplot2 as ggplot2
+utils = rpackages.importr('utils')
+utils.chooseCRANmirror(ind=1)
+
+utils.install_packages('ggplot2')
+utils.install_packages('lazyeval')
+
+grdevices = importr('grDevices')
+grdevices.png(file="/Users/dradecic/Desktop/mtcars.png", width=1024, height=512)
+datasets = importr('datasets')
+mtcars = data(datasets).fetch('mtcars')['mtcars']
+
+pp = (ggplot2.ggplot(mtcars) +
+      ggplot2.aes_string(x='wt', y='mpg', col='factor(cyl)') +
+      ggplot2.geom_point())
+pp.plot()
+
+grdevices.dev_off()
+
+
 
 # dice1 = [1, 2, 3, 4, 5, 6]
 # dice2 = [1, 2, 3, 4, 5, 6]
@@ -40,28 +64,36 @@ from probabilify import Probabilify
 # Problibilify is my own term for turning the word probability into a verb of action potential
 # Probabilify is a class that takes a list of objects and turns it into a probability object
 
-# Crete a dice object with 6 sides
-dice1 = [1, 2, 3, 4, 5, 6]
-# Turn the dice into a probabilify object
-dice = Probabilify(dice1)
-# build a sample space of 2 rolls
-rolls = 2
-ss = dice.get_sample_space(observations=rolls, replacement=True)
-
-# probability of rolling two dice such that the total is 10 or greater
-outcomes = [(6, 4), (6, 5), (6, 6), (5, 5), (5, 6), (4, 6)]
-dice.probability_of_outcomes(ss, outcomes, keep_position=True)
-
-
+# Crete a die object with 6 sides
+# dice1 = [1, 2, 3, 4, 5, 6]
+# # Turn the dice into a probabilify object
+# dice = Probabilify(dice1)
+# # build a sample space of 2 rolls
+# rolls = 2
+# ss = dice.get_sample_space(observations=rolls, replacement=True)
+#
+# # probability of rolling two dice such that the total is 10 or greater
+# outcomes = [(6, 4), (6, 5), (6, 6), (5, 5), (5, 6), (4, 6)]
+# dice.probability_of_outcomes(ss, outcomes, keep_position=True)
 
 
 
+pi = robjects.r['pi']
+print(pi)
+print(type(pi))
 
+robjects.r('''
+    add_nums <- function(x, y) {
+        return(x + y)
+    }
 
+    print(add_nums(x = 5, y = 10))
+    print(add_nums(x = 10, y = 20))
+''')
 
-
-
-
+datasets = importr('datasets')
+mtcars = data(datasets).fetch('mtcars')['mtcars']
+print(mtcars)
 
 
 
