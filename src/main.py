@@ -45,8 +45,8 @@ direction = Probabilify(directions)
 # probability car will turn
 num_cars = 2
 ss = direction.get_sample_space(observations=num_cars, replacement=True)
-# probablilty at least one care will turn left
-turns = [('L', '?'), ('?', 'L')]
+# probablilty at only one car will turn left
+turns = [('L', 'R'), ('S', 'L'), ('L', 'S'), ('R', 'L')]
 print(direction.probability_of_outcomes(ss, turns, keep_position=True, replacement=False))
 
 

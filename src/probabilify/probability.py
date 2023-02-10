@@ -245,11 +245,9 @@ class Probabilify(Statify):
                         for sample in sample_space:
                             # find all places variable value appears in the sample
                             if all([x in sample for x in outcome if x != '?']):
-                                if replacement is False:
-                                    # verify that sample is not already in already_found
-                                    if sample not in already_found:
-                                        already_found.append(sample)
-                                        count += 1
+                                if not replacement:
+                                    count += (1 if sample not in already_found else 0)
+                                    already_found.append(sample)
                                 else:
                                     count += 1
                     else:
@@ -257,27 +255,23 @@ class Probabilify(Statify):
                         # remove the ? from the list
                         for i in range(len(outcome_list)):
                             if outcome_list[i].find('?') > -1:
-                                outcome_list[i] = outcome_list[i].replace('?',
-                                                                          '')
+                                outcome_list[i] = outcome_list[i].replace('?', '')
                         for sample in sample_space:
                             if all([x in str(sample) for x in outcome_list if
                                     x != '?']):
-                                if replacement is False:
+                                if not replacement:
                                     # verify that sample is not already in already_found
-                                    if sample not in already_found:
-                                        already_found.append(sample)
-                                        count += 1
+                                    count += (1 if sample not in already_found else 0)
+                                    already_found.append(sample)
                                 else:
                                     count += 1
 
                 else:
                     for sample in sample_space:
                         if all([x in sample for x in outcome if x != '?']):
-                            if replacement is False:
-                                # verify that sample is not already in already_found
-                                if sample not in already_found:
-                                    already_found.append(sample)
-                                    count += 1
+                            if not replacement:
+                                count += (1 if sample not in already_found else 0)
+                                already_found.append(sample)
                             else:
                                 count += 1
                 probability = count / len(sample_space)
@@ -294,7 +288,6 @@ class Probabilify(Statify):
                     if not isValidChar:
                         for sample in sample_space:
                             flags = [False] * len(outcome)
-
                             for i in range(len(outcome)):
                                 if outcome[i] == sample[i]:
                                     flags[i] = True
@@ -303,11 +296,10 @@ class Probabilify(Statify):
                                 else:
                                     flags[i] = False
                             if all(flags):
-                                if replacement is False:
+                                if not replacement:
                                     # verify that sample is not already in already_found
-                                    if sample not in already_found:
-                                        already_found.append(sample)
-                                        count += 1
+                                    count += (1 if sample not in already_found else 0)
+                                    already_found.append(sample)
                                 else:
                                     count += 1
 
@@ -321,21 +313,19 @@ class Probabilify(Statify):
                         for sample in sample_space:
                             if all([x in str(sample) for x in outcome_list if
                                     x != '?']):
-                                if replacement is False:
+                                if not replacement:
                                     # verify that sample is not already in already_found
-                                    if sample not in already_found:
-                                        already_found.append(sample)
-                                        count += 1
+                                    count += (1 if sample not in already_found else 0)
+                                    already_found.append(sample)
                                 else:
                                     count += 1
                 else:
                     for sample in sample_space:
                         if all([x in sample for x in outcome if x != '?']):
-                            if replacement is False:
+                            if not replacement:
                                 # verify that sample is not already in already_found
-                                if sample not in already_found:
-                                    already_found.append(sample)
-                                    count += 1
+                                count += (1 if sample not in already_found else 0)
+                                already_found.append(sample)
                             else:
                                 count += 1
                 probability = count / len(sample_space)
@@ -343,15 +333,6 @@ class Probabilify(Statify):
                 # calculate the probability
                 probability = sample_space.count(outcome) / len(sample_space)
         return probability, already_found
-
-    def _remove_duplicates(self, sample_space):
-        """
-        Removes any duplicates from the sample space
-        :param sample_space: the sample space
-        :return: the sample space without duplicates
-        """
-        sample_space = [x for x in sample_space if len(set(x)) == len(x)]
-        return sample_space
 
     def probability_of_outcomes(self,
                                 sample_space,
