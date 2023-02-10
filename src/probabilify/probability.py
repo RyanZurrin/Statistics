@@ -218,7 +218,11 @@ class Probabilify(Statify):
         return sample
 
     @staticmethod
-    def __probability_of_outcome(sample_space, outcome, keep_position=False):
+    def __probability_of_outcome(sample_space,
+                                 outcome,
+                                 keep_position=False,
+                                 replacement=False,
+                                 already_found=None):
         """
         Calculates the probability of a given outcome, can use ? as a wildcard in
         the outcome strings
@@ -226,6 +230,7 @@ class Probabilify(Statify):
         :param sample_space: the sample space
         :param outcome: the outcome
         :param keep_position: whether to keep the position outcome
+        :param replacement: whether the observations are taken with replacement
         :return: the probability of the outcome
         """
         if keep_position is False:
@@ -240,7 +245,13 @@ class Probabilify(Statify):
                         for sample in sample_space:
                             # find all places variable value appears in the sample
                             if all([x in sample for x in outcome if x != '?']):
-                                count += 1
+                                if replacement is False:
+                                    # verify that sample is not already in already_found
+                                    if sample not in already_found:
+                                        already_found.append(sample)
+                                        count += 1
+                                else:
+                                    count += 1
                     else:
                         outcome_list = list(outcome)
                         # remove the ? from the list
@@ -251,17 +262,26 @@ class Probabilify(Statify):
                         for sample in sample_space:
                             if all([x in str(sample) for x in outcome_list if
                                     x != '?']):
-                                count += 1
+                                if replacement is False:
+                                    # verify that sample is not already in already_found
+                                    if sample not in already_found:
+                                        already_found.append(sample)
+                                        count += 1
+                                else:
+                                    count += 1
 
                 else:
-                    print('index <= 0')
                     for sample in sample_space:
                         if all([x in sample for x in outcome if x != '?']):
-                            count += 1
-                # calculate the probability
+                            if replacement is False:
+                                # verify that sample is not already in already_found
+                                if sample not in already_found:
+                                    already_found.append(sample)
+                                    count += 1
+                            else:
+                                count += 1
                 probability = count / len(sample_space)
             else:
-                # calculate the probability
                 probability = sample_space.count(outcome) / len(sample_space)
         else:
             if str(outcome).find('?') > -1:
@@ -283,7 +303,13 @@ class Probabilify(Statify):
                                 else:
                                     flags[i] = False
                             if all(flags):
-                                count += 1
+                                if replacement is False:
+                                    # verify that sample is not already in already_found
+                                    if sample not in already_found:
+                                        already_found.append(sample)
+                                        count += 1
+                                else:
+                                    count += 1
 
                     else:
                         outcome_list = list(outcome)
@@ -295,43 +321,70 @@ class Probabilify(Statify):
                         for sample in sample_space:
                             if all([x in str(sample) for x in outcome_list if
                                     x != '?']):
-                                count += 1
-
+                                if replacement is False:
+                                    # verify that sample is not already in already_found
+                                    if sample not in already_found:
+                                        already_found.append(sample)
+                                        count += 1
+                                else:
+                                    count += 1
                 else:
                     for sample in sample_space:
                         if all([x in sample for x in outcome if x != '?']):
-                            count += 1
-                # calculate the probability
+                            if replacement is False:
+                                # verify that sample is not already in already_found
+                                if sample not in already_found:
+                                    already_found.append(sample)
+                                    count += 1
+                            else:
+                                count += 1
                 probability = count / len(sample_space)
             else:
                 # calculate the probability
                 probability = sample_space.count(outcome) / len(sample_space)
-        return probability
+        return probability, already_found
+
+    def _remove_duplicates(self, sample_space):
+        """
+        Removes any duplicates from the sample space
+        :param sample_space: the sample space
+        :return: the sample space without duplicates
+        """
+        sample_space = [x for x in sample_space if len(set(x)) == len(x)]
+        return sample_space
 
     def probability_of_outcomes(self,
                                 sample_space,
                                 outcome,
                                 keep_position=False,
+                                replacement=False,
                                 display=True):
         """
         Calculates the probability of a given outcomes, can use ? as a wildcard in
         the outcome strings
         :param sample_space: the sample space
         :param outcome:  the outcome
-        :param keep_position:  whether to keep the position outcome
+        :param keep_position:  whether position is important
         :param display: whether to display the probability
+        :param replacement: whether the observations are taken with replacement
         :return:  the probability of the outcome
         """
+        outcomes = []
         if isinstance(outcome, list):
             probability = 0
             for out in outcome:
-                probability += self.__probability_of_outcome(sample_space, out,
-                                                             keep_position)
+                cur_prob, outcomes = self.__probability_of_outcome(sample_space,
+                                                                   out,
+                                                                   keep_position,
+                                                                   replacement,
+                                                                   outcomes)
+                probability += cur_prob
         else:
-            probability = self.__probability_of_outcome(sample_space, outcome,
-                                                        keep_position)
+            probability = self.__probability_of_outcome(sample_space,
+                                                        outcome,
+                                                        keep_position,
+                                                        replacement)
 
         if display:
             print(f'Probability of {outcome} is {probability}')
         return probability
-

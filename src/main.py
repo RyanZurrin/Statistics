@@ -31,11 +31,28 @@ from probabilify import Probabilify
 # print("total permutations of a deck of cards")
 # print(deck.permutations())
 #
-# # print the total permutations of a deck of cards with replacement
-# print("total permutations of wines")
-# # print(die.permutations())
-# wines = ['R', 'L', 'S']
-# outcomes = [('L', '?')]
+# print the total permutations of a deck of cards with replacement
+
+
+# A vehicle arriving at an intersection can turn right, turn left, or continue straight ahead.
+# The experiment consists of observing the movement of a single vehicle through the intersection.
+# a. List the sample space for this experiment.
+# b. Assuming that all sample points are equally likely, find the probability that the vehicle turns.
+print("total direction two cars can turn form stop light")
+# print(die.permutations())
+directions = ['R', 'L', 'S']
+direction = Probabilify(directions)
+# probability car will turn
+num_cars = 2
+ss = direction.get_sample_space(observations=num_cars, replacement=True)
+# probablilty at least one care will turn left
+turns = [('L', '?'), ('?', 'L')]
+print(direction.probability_of_outcomes(ss, turns, keep_position=True, replacement=False))
+
+
+
+
+
 # # outcomes = [('A', 'B', 'A', 'A'), ('B', 'B', 'B', 'B')]
 # positions = 2
 # rankings = Probabilify(wines)
@@ -69,12 +86,12 @@ from probabilify import Probabilify
 #
 #Three patients enter the hospital and randomly choose stations 1, 2, or 3 for service.
 # Then, the sample space S contains the following
-patients = ['A', 'B', 'C']
-stations = [1, 2, 3]
-# # Create a list of the possible outcomes
-p = Probabilify(patients)
-ss = p.get_sample_space(observations=3, replacement=True)
-
+# patients = ['A', 'B', 'C']
+# stations = [1, 2, 3]
+# # # Create a list of the possible outcomes
+# p = Probabilify(patients)
+# ss = p.get_sample_space(observations=3, replacement=True)
+#
 
 
 #
