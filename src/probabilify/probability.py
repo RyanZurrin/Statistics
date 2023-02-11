@@ -13,6 +13,87 @@ class Probabilify(Statify):
     def __init__(self, data):
         super().__init__(data)
         self.__data = data
+        # create the sample space from the data set
+        self.sample_space = self.create_sample_space()
+
+    def __add__(self, other):
+        """
+        Union of two sample spaces ('+' operator)
+        """
+        # if the other object is not a Probabilify object, raise an error
+        if not isinstance(other, Probabilify):
+            raise TypeError(
+                "unsupported operand type(s) for +: 'Probabilify' and '{}'".format(
+                    type(other)))
+        return self.union(other)
+
+    def __sub__(self, other):
+        """
+        Intersection of two sample spaces ('-' operator)
+        """
+        # if the other object is not a Probabilify object, raise an error
+        if not isinstance(other, Probabilify):
+            raise TypeError(
+                "unsupported operand type(s) for -: 'Probabilify' and '{}'".format(
+                    type(other)))
+        # create a new sample space
+        sample_space = list(set(self.sample_space) - set(other.sample_space))
+        # create a new Probabilify object
+        new_prob = Probabilify(sample_space)
+        return new_prob
+
+    def __mul__(self, other):
+        """
+        Cartesian product of two sample spaces ('*' operator)
+        """
+        # if the other object is not a Probabilify object, raise an error
+        if not isinstance(other, Probabilify):
+            raise TypeError(
+                "unsupported operand type(s) for *: 'Probabilify' and '{}'".format(
+                    type(other)))
+        # create a new sample space
+        return self.cartesian_product(other)
+
+    def __truediv__(self, other):
+        """
+        Difference of two sample spaces ('/' operator)
+        """
+        # if the other object is not a Probabilify object, raise an error
+        if not isinstance(other, Probabilify):
+            raise TypeError(
+                "unsupported operand type(s) for /: 'Probabilify' and '{}'".format(
+                    type(other)))
+        # create a new sample space
+        sample_space = list(set(self.sample_space) - set(other.sample_space))
+        # create a new Probabilify object
+        new_prob = Probabilify(sample_space)
+
+    def __pow__(self, other):
+        """
+        Power set of a sample space ('**' operator)
+        """
+        # if the other object is not a Probabilify object, raise an error
+        if not isinstance(other, Probabilify):
+            raise TypeError(
+                "unsupported operand type(s) for **: 'Probabilify' and '{}'".format(
+                    type(other)))
+        return self.power(other)
+
+    # overload the ^ operator
+    def __xor__(self, other):
+        """
+        symmetric difference of two sample spaces ('^' operator)
+        """
+        # if the other object is not a Probabilify object, raise an error
+        if not isinstance(other, Probabilify):
+            raise TypeError(
+                "unsupported operand type(s) for ^: 'Probabilify' and '{}'".format(
+                    type(other)))
+        # create a new sample space
+        sample_space = list(set(self.sample_space) ^ set(other.sample_space))
+        # create a new Probabilify object
+        new_prob = Probabilify(sample_space)
+        return new_prob
 
     # method to return the data
     @property
@@ -36,6 +117,15 @@ class Probabilify(Statify):
         for value in values:
             count += self.data.count(value)
         return count
+
+    def create_sample_space(self):
+        """
+        Creates a sample space for the data set
+        :return: the sample space
+        """
+        # create the sample space
+        sample_space = list(itertools.product(self.data, repeat=1))
+        return sample_space
 
     @staticmethod
     def factorial(n):
@@ -67,23 +157,43 @@ class Probabilify(Statify):
         permutations = self.factorial(len(self.data))
         return permutations
 
-    def combinations(self, values=None):
+    def combinations(self,
+                     choose=1,
+                     values=None,
+                     with_replacement=False,
+                     allow_duplicates=False):
         """
-        Calculates the number of combinations of a set of values
+        Calculates the number of combinations of a set of values, for instance
+
+        :param choose: the number of values to be chosen
         :param values: the set of values
+        :param with_replacement: whether or not to allow the same value to be chosen
+        more than once
+        :param allow_duplicates: whether or not to allow duplicate values in the
+        data set
         :return: the number of combinations
         """
         # if values is not given, use the data set
         if values is None:
             values = self.data
-        # if the values are not a list, make them a list
-        if not isinstance(values, list):
-            values = [values]
-        # calculate the number of combinations
-        combos = 1
-        for value in values:
-            combos *= self.data.count(value)
-        return combos
+        if not allow_duplicates:
+            # if the values are not a list, make them a list
+            if not isinstance(values, list):
+                values = [values]
+            # if the number of values to be chosen is greater than the number of
+            # values in the data set, raise an error
+            if choose > len(values):
+                raise ValueError(
+                    "choose cannot be greater than the number of values in the data set")
+            # calculate the number of combinations
+            if with_replacement:
+                combinations = self.nCp_with_replacement(len(values), choose)
+            else:
+                combinations = self.nCp(len(values), choose)
+        else:
+            combinations = len(values) ** choose
+        return combinations
+
 
     def nCp(self, n, p):
         """
@@ -246,7 +356,8 @@ class Probabilify(Statify):
                             # find all places variable value appears in the sample
                             if all([x in sample for x in outcome if x != '?']):
                                 if not replacement:
-                                    count += (1 if sample not in already_found else 0)
+                                    count += (
+                                        1 if sample not in already_found else 0)
                                     already_found.append(sample)
                                 else:
                                     count += 1
@@ -255,13 +366,15 @@ class Probabilify(Statify):
                         # remove the ? from the list
                         for i in range(len(outcome_list)):
                             if outcome_list[i].find('?') > -1:
-                                outcome_list[i] = outcome_list[i].replace('?', '')
+                                outcome_list[i] = outcome_list[i].replace('?',
+                                                                          '')
                         for sample in sample_space:
                             if all([x in str(sample) for x in outcome_list if
                                     x != '?']):
                                 if not replacement:
                                     # verify that sample is not already in already_found
-                                    count += (1 if sample not in already_found else 0)
+                                    count += (
+                                        1 if sample not in already_found else 0)
                                     already_found.append(sample)
                                 else:
                                     count += 1
@@ -270,7 +383,8 @@ class Probabilify(Statify):
                     for sample in sample_space:
                         if all([x in sample for x in outcome if x != '?']):
                             if not replacement:
-                                count += (1 if sample not in already_found else 0)
+                                count += (
+                                    1 if sample not in already_found else 0)
                                 already_found.append(sample)
                             else:
                                 count += 1
@@ -298,7 +412,8 @@ class Probabilify(Statify):
                             if all(flags):
                                 if not replacement:
                                     # verify that sample is not already in already_found
-                                    count += (1 if sample not in already_found else 0)
+                                    count += (
+                                        1 if sample not in already_found else 0)
                                     already_found.append(sample)
                                 else:
                                     count += 1
@@ -315,7 +430,8 @@ class Probabilify(Statify):
                                     x != '?']):
                                 if not replacement:
                                     # verify that sample is not already in already_found
-                                    count += (1 if sample not in already_found else 0)
+                                    count += (
+                                        1 if sample not in already_found else 0)
                                     already_found.append(sample)
                                 else:
                                     count += 1
@@ -324,7 +440,8 @@ class Probabilify(Statify):
                         if all([x in sample for x in outcome if x != '?']):
                             if not replacement:
                                 # verify that sample is not already in already_found
-                                count += (1 if sample not in already_found else 0)
+                                count += (
+                                    1 if sample not in already_found else 0)
                                 already_found.append(sample)
                             else:
                                 count += 1
@@ -369,3 +486,107 @@ class Probabilify(Statify):
         if display:
             print(f'Probability of {outcome} is {probability}')
         return probability
+
+    def union(self, other: 'Probabilify') -> 'Probabilify':
+        """
+        Returns the union of two probability spaces
+
+        :param other: the other probability space
+        :return: the union of the two probability spaces
+        """
+        union = Probabilify([x for x in self.sample_space if
+                             x not in other.sample_space] + other.sample_space)
+        union.sample_space = [x for y in union.sample_space for x in y]
+        return union
+
+    def combination(self, other: 'Probabilify') -> 'Probabilify':
+        """
+        Returns the combination of two probability spaces
+
+        :param other: the other probability space
+        :return: the combination of the two probability spaces
+        """
+        combination = Probabilify(
+            [x + y for x in self.sample_space for y in other.sample_space])
+        combination.sample_space = [x for y in combination.sample_space for x in
+                                    y]
+        return combination
+
+    def intersection(self, other: 'Probabilify') -> 'Probabilify':
+        """
+        Returns the intersection of two probability spaces
+
+        :param other: the other probability space
+        :return: the intersection of the two probability spaces
+        """
+        intersection = Probabilify(
+            [x for x in self.sample_space if x in other.sample_space])
+        intersection.sample_space = [x for y in intersection.sample_space for x
+                                     in y]
+        return intersection
+
+    def complement(self) -> 'Probabilify':
+        """
+        Returns the complement of the probability space
+
+        :return: the complement of the probability space
+        """
+        complement = Probabilify(
+            [x for x in self.sample_space if x not in self.sample_space])
+        complement.sample_space = [x for y in complement.sample_space for x in
+                                   y]
+        return complement
+
+    def conditional(self, other: 'Probabilify') -> 'Probabilify':
+        """
+        Returns the conditional probability of the two probability spaces
+
+        :param other: the other probability space
+        :return: the conditional probability of the two probability spaces
+        """
+        conditional = Probabilify(
+            [x for x in self.sample_space if x in other.sample_space])
+        conditional.sample_space = [x for y in conditional.sample_space for x in
+                                    y]
+        return conditional
+
+    def cartesian_product(self, other):
+        """
+        Returns the cartesian product of the two probability spaces
+
+        :param other: the other probability space
+        :return: the cartesian product of the two probability spaces
+        """
+        cartesian_product = Probabilify(
+            [x + y for x in self.sample_space for y in other.sample_space])
+        cartesian_product.sample_space = [x for y in
+                                          cartesian_product.sample_space for x
+                                          in y]
+        return cartesian_product
+
+    def power_set(self):
+        """
+        Returns the power set of the sample space
+        """
+        # create a list of all the subsets of the sample space
+        subsets = []
+        # turn the subspace into a flattend list
+        flattened = [item for sublist in self.sample_space for item in sublist]
+        # create a list of all the subsets of the flattened list
+        for i in range(len(flattened) + 1):
+            subsets.append(list(itertools.combinations(flattened, i)))
+        # return the list of subsets
+        return subsets
+
+    def power(self, other):
+        """
+        Returns the power of the two probability spaces
+
+        :param other: the other probability space
+        :return: the power of the two probability spaces
+        """
+        temp = self + other
+        subsets = temp.power_set()
+        power = Probabilify(subsets)
+        power.sample_space = [x for y in power.sample_space for x in y]
+        return power

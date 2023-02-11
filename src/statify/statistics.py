@@ -30,8 +30,14 @@ class Statify(object):
             self._data = pd.read_csv(data)
         elif isinstance(data, Statify):
             self._data = data._data
+        elif isinstance(data, dict):
+            self._data = data
+        elif isinstance(data, tuple):
+            self._data = data
+        elif isinstance(data, set):
+            self._data = data
         else:
-            raise TypeError('data must be a list, table or path to csv file')
+            raise TypeError('Invalid data type')
 
         self.population = population
 

@@ -42,6 +42,22 @@ class TestPermutations(unittest.TestCase):
                          80658175170943878571660636856403766975289505440883277824000000000000)
 
 
+# test the combinations function with a list of numbers
+class TestCombinations(unittest.TestCase):
+    # total combinations of a deck of cards and a die
+    deck = Probabilify(cards)
+    die = Probabilify(dice1)
+
+    def test_die_combinations(self):
+        self.assertEqual(Probabilify.combinations(self.die, choose=2), 15)
+        self.assertEqual(Probabilify.combinations(self.die, choose=2,
+                                                  with_replacement=True), 21)
+
+
+    def test_deck_combinations(self):
+        self.assertEqual(Probabilify.combinations(self.deck, choose=5), 2598960)
+
+
 # test the probability of rolling a even number on a die
 class TestProbability(unittest.TestCase):
     def test_probability_of_events(self):
