@@ -1,3 +1,4 @@
+import pprint
 import random
 
 import matplotlib.pyplot as plt
@@ -171,7 +172,7 @@ class Statify(object):
             print(tabulate.tabulate(self._data, headers='keys',
                                     tablefmt='psql'))
         else:
-            print(self._data)
+            print(tabulate.tabulate(self._data, tablefmt='psql'))
 
     def summary(self):
         # print the summary of the data, if df then each column has a summary

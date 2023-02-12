@@ -1,5 +1,8 @@
 import itertools
 import random
+from pprint import pprint
+
+from tabulate import tabulate
 
 from src.statify import Statify
 
@@ -103,6 +106,24 @@ class Probabilify(Statify):
         """
         return self.__data
 
+    @data.setter
+    def data(self, data):
+        """
+        :param data: the data
+        """
+        self.__data = data
+
+    def remove_sample(self, sample):
+        """
+        Removes a sample from the sample space in place
+        :param sample: the sample to be removed
+        :return: the new sample space
+        """
+        print("Removing sample: {}".format(sample))
+        # remove the sample from the sample space
+        self.sample_space.remove(sample)
+        return self.sample_space
+
     def count(self, values):
         """
         Counts the number of times a value or set of values appear in the data set
@@ -125,6 +146,8 @@ class Probabilify(Statify):
         """
         # create the sample space
         sample_space = list(itertools.product(self.data, repeat=1))
+        # if the data is only a list of values make sure the sample space is a list of
+        # values and not a list of tuples
         return sample_space
 
     @staticmethod
@@ -194,7 +217,6 @@ class Probabilify(Statify):
             combinations = len(values) ** choose
         return combinations
 
-
     def nCp(self, n, p):
         """
         Calculates the number of combinations of n things taken p at a time
@@ -258,19 +280,33 @@ class Probabilify(Statify):
         return permutations
 
     # method to return the probability of a given value
-    def probability(self, value, trials=1):
+    def probability(self, value, data=None, trials=1):
         """
         CaCalculates the probability a value or set of values will be picked  from
         the data set over a given number of trials
 
         :param value:  the value or set of values to be picked
+        :param data:  the data set to be used
         :param trials: the number of trials to be run
         :return: the probability of the value or set of values being picked
         """
-        # get the number of times the value or values appear in the data set
-        count = self.count(value)
+        # if value is not given, use the data set
+        if data is None:
+            data = self.data
+        # if the value is not a list, make it a list
+        if not isinstance(value, list):
+            value = [value]
+        # if the data is not a list, make it a list
+        if not isinstance(data, list):
+            data = [data]
         # calculate the probability
-        probability = count / (len(self.data) * trials)
+        probability = 0
+        for i in range(trials):
+            if value == data:
+                probability += 1
+            else:
+                probability += 0
+        probability = probability / trials
         return probability
 
     def get_sample_space(self,
@@ -478,10 +514,10 @@ class Probabilify(Statify):
                                                                    outcomes)
                 probability += cur_prob
         else:
-            probability = self.__probability_of_outcome(sample_space,
-                                                        outcome,
-                                                        keep_position,
-                                                        replacement)
+            probability, outcomes = self.__probability_of_outcome(sample_space,
+                                                                  outcome,
+                                                                  keep_position,
+                                                                  replacement)
 
         if display:
             print(f'Probability of {outcome} is {probability}')
@@ -590,3 +626,27 @@ class Probabilify(Statify):
         power = Probabilify(subsets)
         power.sample_space = [x for y in power.sample_space for x in y]
         return power
+
+    @staticmethod
+    def simulate_experiment(experiment, trials, display=True):
+        """
+        Simulates an experiment
+        :param experiment: the experiment to simulate
+        :param trials: the number of trials to simulate
+        :return: the results of the experiment
+        """
+        results = []
+        for i in range(trials):
+            results.append(experiment())
+
+        if display:
+            print(f'Experiment results: {results}')
+        return results
+
+    def display_sample_space(self):
+        """
+        Displays the sample space with pretty formatting and tabulate
+        """
+        print(tabulate(self.sample_space, tablefmt='psql'))
+
+
