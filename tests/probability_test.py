@@ -3,7 +3,7 @@ import unittest
 import sys, os
 
 sys.path.append(os.path.realpath((os.path.dirname(__file__) + '/../')))
-from src.probabilify import Probabilify
+from statistical_analysis.probabilify import Probabilify
 
 dice1 = [1, 2, 3, 4, 5, 6]
 cards = ['AH', '2H', '3H', '4H', '5H', '6H', '7H', '8H', '9H', '10H', 'JH',

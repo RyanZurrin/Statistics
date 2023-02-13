@@ -4,7 +4,7 @@ from pprint import pprint
 
 from tabulate import tabulate
 
-from src.statify import Statify
+from statistical_analysis.statify import Statify
 
 
 # class to turn data into a probability object, given a data set
