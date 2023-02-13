@@ -53,7 +53,6 @@ class TestCombinations(unittest.TestCase):
         self.assertEqual(Probabilify.combinations(self.die, choose=2,
                                                   with_replacement=True), 21)
 
-
     def test_deck_combinations(self):
         self.assertEqual(Probabilify.combinations(self.deck, choose=5), 2598960)
 
@@ -64,6 +63,19 @@ class TestProbability(unittest.TestCase):
         die = Probabilify(dice1)
         evens = [2, 4, 6]
         self.assertEqual(die.probability(evens), 0.5)
+
+
+# test nCr
+class TestNcr(unittest.TestCase):
+    def test_ncr(self):
+        self.assertEqual(Probabilify.nCr(10, 5), 252.0)
+        self.assertEqual(Probabilify.nCr(10, 5, replacement=True), 2002.0)
+        self.assertEqual(Probabilify.nCr(5, 3), 10)
+        self.assertEqual(Probabilify.nCr(5, 3, replacement=True), 35)
+        self.assertEqual(Probabilify.nCr(5, 4), 5)
+        self.assertEqual(Probabilify.nCr(5, 4, replacement=True), 70)
+        self.assertEqual(Probabilify.nCr(5, 5), 1)
+        self.assertEqual(Probabilify.nCr(5, 5, replacement=True), 126)
 
 
 if __name__ == '__main__':

@@ -210,74 +210,60 @@ class Probabilify(Statify):
                     "choose cannot be greater than the number of values in the data set")
             # calculate the number of combinations
             if with_replacement:
-                combinations = self.nCp_with_replacement(len(values), choose)
+                combinations = self.nCr(len(values), choose, replacement=True)
             else:
-                combinations = self.nCp(len(values), choose)
+                combinations = self.nCr(len(values), choose)
         else:
             combinations = len(values) ** choose
         return combinations
 
-    def nCp(self, n, p):
+    @staticmethod
+    def nCr(n, r, replacement=False):
         """
         Calculates the number of combinations of n things taken p at a time
         :param n: the number of things
-        :param p: the number of things taken at a time
+        :param r: the number of things taken at a time
+        :param replacement: whether or not to allow the same thing to be chosen
         :return: the number of combinations
         """
-        # calculate the number of combinations
-        combos = self.factorial(n) / (
-                self.factorial(p) * self.factorial(n - p))
+        if replacement:
+            combos = Probabilify.factorial(n + r - 1) / (
+                    Probabilify.factorial(r) * Probabilify.factorial(n - 1))
+        else:
+            combos = Probabilify.factorial(n) / (
+                    Probabilify.factorial(r) * Probabilify.factorial(n - r))
         return combos
 
-    def nCp_with_replacement(self, n, p):
-        """
-        Calculates the number of combinations of n things taken p at a time with replacement
-        :param n: the number of things
-        :param p: the number of things taken at a time
-        :return: the number of combinations
-        """
-        # calculate the number of combinations
-        combos = self.factorial(n + p - 1) / (
-                self.factorial(p) * self.factorial(n - 1))
-        return combos
-
-    def nPr(self, n, p):
+    @staticmethod
+    def nPr(n, r, replacement=False):
         """
         Calculates the number of permutations of n things taken p at a time
         :param n: the number of things
-        :param p: the number of things taken at a time
+        :param r: the number of things taken at a time
+        :param replacement: whether or not to allow the same thing to be chosen
         :return: the number of permutations
         """
-        # calculate the number of permutations
-        permutations = self.factorial(n) / self.factorial(n - p)
-        return permutations
+        if replacement:
+            permutations = n ** r
+        else:
+            permutations = Probabilify.factorial(n) / Probabilify.factorial(n - r)
+            return permutations
 
-    def nPr_with_replacement(self, n, p):
-        """
-        Calculates the number of permutations of n things taken p at a time with replacement
-        :param n: the number of things
-        :param p: the number of things taken at a time
-        :return: the number of permutations
-        """
-        # calculate the number of permutations
-        permutations = n ** p
-        return permutations
-
-    def nPn(self, n: list, p):
+    @staticmethod
+    def nPk(n, k: list):
         """
         the number of ways of partitioning  n distinct objects into k distinct
-        groups containing n_1, n_2, ..., n_k objects respectively, where each
-        object appears in exactly one group. N = n! / (n_1! * n_2! * ... * n_k!)
+        groups containing k_1, k_2, ..., k_i objects respectively, where each
+        object appears in exactly one group. N = n! / (k_1! * k_2! * ... * k_i!)
         :param n:  the number of objects
-        :param p:  the number of groups
+        :param k:  groups, where the total of all groups is n
         :return:  the number of ways of partitioning n objects into k groups
         """
-        # calculate the number of ways of partitioning n objects into k groups
         denominator = 1
-        for i in n:
-            denominator *= self.factorial(i)
-        permutations = self.factorial(sum(n)) / denominator
-        return permutations
+        for i in k:
+            denominator *= Probabilify.factorial(i)
+        nPk = Probabilify.factorial(n) / denominator
+        return nPk
 
     # method to return the probability of a given value
     def probability(self, value, data=None, trials=1):
@@ -290,7 +276,7 @@ class Probabilify(Statify):
         :param trials: the number of trials to be run
         :return: the probability of the value or set of values being picked
         """
-        # if value is not given, use the data set
+        # if data is not given, use the data set
         if data is None:
             data = self.data
         # if the value is not a list, make it a list
@@ -299,14 +285,11 @@ class Probabilify(Statify):
         # if the data is not a list, make it a list
         if not isinstance(data, list):
             data = [data]
+        # if the value is not in the data set, raise an error
+        if not all(x in data for x in value):
+            raise ValueError("value must be in the data set")
         # calculate the probability
-        probability = 0
-        for i in range(trials):
-            if value == data:
-                probability += 1
-            else:
-                probability += 0
-        probability = probability / trials
+        probability = len(value) / len(data)
         return probability
 
     def get_sample_space(self,
@@ -314,6 +297,7 @@ class Probabilify(Statify):
                          outcomes=None,
                          replacement=False,
                          duplicates=True,
+                         flatten=False,
                          display=True):
         """
         Calculates the sample space for a given number of observations and outcomes
@@ -340,6 +324,9 @@ class Probabilify(Statify):
         if duplicates is False:
             sample_space = [x for x in sample_space if len(set(x)) == len(x)]
 
+        if flatten:
+            sample_space = [x for y in sample_space for x in y]
+
         if display:
             # add a new line every 10 items
             for i in range(0, len(sample_space), 10):
@@ -361,6 +348,24 @@ class Probabilify(Statify):
         sample_space = self.get_sample_space(observations, outcomes,
                                              replacement)
         sample = random.choice(sample_space)
+        return sample
+
+    def srswr(self, n):
+        """
+        Simple Random Sample With Replacement
+        :param n: the number of observations
+        :return: the sample
+        """
+        sample = [random.choice(self.data) for i in range(n)]
+        return sample
+
+    def srswor(self, n):
+        """
+        Simple Random Sample Without Replacement
+        :param n: the number of observations
+        :return: the sample
+        """
+        sample = random.sample(self.data, n)
         return sample
 
     @staticmethod
@@ -520,7 +525,7 @@ class Probabilify(Statify):
                                                                   replacement)
 
         if display:
-            print(f'Probability of {outcome} is {probability}')
+            pprint(f'Probability of {outcome} is {probability}')
         return probability
 
     def union(self, other: 'Probabilify') -> 'Probabilify':
@@ -561,6 +566,37 @@ class Probabilify(Statify):
                                      in y]
         return intersection
 
+    def intersect(self, seta, setb, ss=None, return_intersection=False):
+        """
+        get the set of intersection values from seta and setB and then find
+        the percent of that intersection of the sample space
+        :param seta:
+        :param setb:
+        :param ss: the sample space
+        :param return_intersection: whether to return the intersection
+        :return:
+        """
+        print('seta', seta)
+        print('setb', setb)
+        if isinstance(seta, list):
+            seta = set(seta)
+        if isinstance(setb, list):
+            setb = set(setb)
+        intersection = list(seta.intersection(setb))
+        print('intersection', intersection)
+        count = 0
+        # find the % of sample space the intersection consists of
+        if return_intersection:
+            return intersection
+        if ss is None:
+            ss = self.sample_space
+        print('sample space', ss)
+        for sample in ss:
+            if sample in intersection:
+                count += 1
+        return count / len(ss)
+
+
     def complement(self) -> 'Probabilify':
         """
         Returns the complement of the probability space
@@ -572,6 +608,19 @@ class Probabilify(Statify):
         complement.sample_space = [x for y in complement.sample_space for x in
                                    y]
         return complement
+
+    # create a method to calculate P(A|B)
+    def prob_A_given_B(self, A, B):
+        """
+        Returns the probability of A given B
+
+        :param A: the probability space A
+        :param B: the probability space B
+        :return: the probability of A given B
+        """
+        return self.intersection(A).intersection(B).probability_of_outcomes(
+            self.intersection(A).intersection(B).sample_space,
+            self.intersection(A).intersection(B).sample_space)
 
     def conditional(self, other: 'Probabilify') -> 'Probabilify':
         """
@@ -649,4 +698,25 @@ class Probabilify(Statify):
         """
         print(tabulate(self.sample_space, tablefmt='psql'))
 
+    def bayes_rule(self, event_a, event_b):
+        """
+        Calculate the probability of event A given event B
+        P(B|A) = (P(A|B) · P(B)) / P(A)
 
+        :param event_a: event A
+        :param event_b: event B
+        :return: probability of event A given event B
+
+        """
+        # calculate P(A|B)
+        p_a_given_b = self.probability_of_outcomes(self.sample_space, event_a,
+                                                   keep_position=True)
+        # calculate P(B)
+        p_b = self.probability_of_outcomes(self.sample_space, event_b,
+                                           keep_position=True)
+        # calculate P(A)
+        p_a = self.probability_of_outcomes(self.sample_space, event_a,
+                                           keep_position=True)
+        # calculate P(B|A)
+        p_b_given_a = (p_a_given_b * p_b) / p_a
+        return p_b_given_a
