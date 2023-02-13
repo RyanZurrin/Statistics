@@ -1,0 +1,101 @@
+---
+title: "HW2 - Exercise 3 (Covid-19)"
+author: "MATH 345-545"
+date: "Spring 2022"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 1
+Import the data:
+```{r}
+covid <- read.table("world-covid-2022-02-04.txt", header = TRUE)
+```
+Note: the argument `header = TRUE` tells R that the first line of the data file contains the variables' names -not data. 
+
+Attach the data frame for easier manipulation:
+```{r}
+attach(covid)
+```
+
+## Question 2
+
+Number of rows (cases) and columns (variables) in dataset: 
+```{r}
+dim(covid)
+str(covid) # to get information on variable names and types
+```
+
+
+## Question 3
+Plot population size (x axis) versus total number of cases (y axis):
+```{r}
+plot(Population, Total.Cases)
+```
+
+Because of very large values, this scatter plot is a little difficult to interpret. Plot it again on a logarithmic scale: 
+```{r}
+plot(Population, Total.Cases,  log = "xy")
+## Add a regression line
+reg <- lm(log(Total.Cases) ~ log(Population))
+summary(reg)
+abline(reg, col = "red", lwd = 1.5)
+```
+
+## Question 4
+
+```{r}
+hist(Tests.1M.pop, breaks = 20)
+```
+
+
+This histogram is skewed to the right (it has a long right tail). While most countries have under 5 millions tests per million people, some have over 20 million tests per million people. 
+
+```{r}
+hist(log10(Tests.1M.pop), breaks = 20)
+```
+
+This histogram shows the same data on a logarithmic scale base 10). As a result, it shows much more detail on the lower values (say, under 1M test per M people) which make up most of the data. Here, the histogram appears skewed to the left (long left tail, shorter right tail).
+
+
+List the countries by increasing order of testing (not asked in the homework):
+
+```{r}
+o <- order(Tests.1M.pop)
+data.frame(Country[o], Tests.1M.pop[o])
+```
+
+## Question 5
+
+Calculate the ratio of active cases over population size:
+
+```{r}
+r <- Active.Cases / Population
+```
+
+What is the largest value of this ratio?
+
+```{r}
+max(r) # does not work because of missing values
+max(r, na.rm = TRUE) # this work but we don't which country this corresponds to
+```
+
+
+Find the corresponding country:
+```{r}
+idx <- which.max(r)
+Country[idx]
+```
+
+In light of the fact that Denmark has the highest testing rate (question 4), it makes sense that the Faeroe Islands, an autonomous territory of Denmark, has the highest rate of active infections. This is because more testing implies more detection of the virus, all other things being equal. 
+
+
+Finally, don't forget to detach the data frame when you are done with your analysis: 
+```{r}
+detach(covid)
+```
