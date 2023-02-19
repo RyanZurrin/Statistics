@@ -1,11 +1,16 @@
-
-
 // create javascript object that will hold a dictionary of words loaded from a txt file
 let words = {};
 let permutations = [];
-
+let perms = [];
 // load the words from the txt file into the words object
-$.get('words.txt', function(data) {
+
+
+// make all the functions available to the HTML page
+
+
+$.get('js/words.txt', function (data) {
+    // log to console that the words.txt file was loaded
+    console.log('words.txt file loaded');
     let lines = data.split('\n');
     for (let i = 0; i < lines.length; i++) {
         let word = lines[i].split(' ');
@@ -15,29 +20,48 @@ $.get('words.txt', function(data) {
     console.log(words);
 });
 
-// function to find all permutations of a string under 20 characters
-function permute(str) {
-    let arr = str.split(''),
-        len = arr.length,
-        perms = [],
-        rest,
-        picked,
-        restPerms,
-        next;
+// funciton to validate the input is uncer 15 characters and only contains letters and spaces
+function validate(str) {
+    let regex = /^[a-zA-Z\s]*$/;
+    if (str.length > 15 || !regex.test(str)) {
+        return false;
+    } else {
+        return true;
+    }
+}
 
-    if (len == 0)
-        return [str];
-
-    for (let i = 0; i < len; i++) {
-        rest = Object.create(arr);
-        picked = rest.splice(i, 1);
-
-        restPerms = permute(rest.join(''));
-
-        for (let j = 0, jLen = restPerms.length; j < jLen; j++) {
-            next = picked.concat(restPerms[j]);
-            perms.push(next.join(''));
+// function to find all permutations of a string
+function permute(str, len) {
+    // log to console in permute function was hit
+    console.log('permute function hit');
+    let arr = str.split('');
+    if (len === undefined) {
+        len = arr.length;
+    }
+    if (len === 1) {
+        return arr.map(function (val) {
+            return val;
+        });
+    }
+    for (let i = 0; i < arr.length; i++) {
+        let firstChar = arr.splice(i, 1);
+        let innerPerms = permute(arr.join(''), len - 1);
+        for (let j = 0; j < innerPerms.length; j++) {
+            perms.push(firstChar + innerPerms[j]);
         }
+        arr.splice(i, 0, firstChar);
+    }
+    return perms;
+}
+
+
+// function to find all arrangemntes of a string so a 4 letter word will have 64 different permutations
+// whiich is 4C1 + 4C2 + 4C3 + 4C4
+function allArrangements(str) {
+    // log to console in allArrangements function was hit
+    console.log('allArrangements function hit');
+    for (let i = 1; i <= str.length; i++) {
+        perms = perms.concat(permute(str, i));
     }
     return perms;
 }
@@ -49,6 +73,8 @@ function isWord(str) {
 
 // function given a list of permutations, return a list of valid words with no duplicates
 function getWords(perms) {
+    // log to console in getWords function was hit
+    console.log('getWords function hit');
     let words = [];
     for (let i = 0; i < perms.length; i++) {
         if (isWord(perms[i])) {
@@ -58,16 +84,19 @@ function getWords(perms) {
     return words;
 }
 
-// when the html page is loaded fill the words object with the words from the txt file
-$(document).ready(function() {
-    // automatically load the word list into the words object
-    $.get('js/words.txt', function(data) {
-        let lines = data.split('\n');
-        for (let i = 0; i < lines.length; i++) {
-            let word = lines[i].split(' ');
-            words[word[0]] = word[1];
-        }
-        // display the words object in the console
-        console.log(words);
-    });
-});
+// function that when submit button is hit will use the input from the text box to find all permutations of the string
+// and then find all valid words from the permutations and display them on the webpage
+function submitNameHit() {
+    // log to console saying submit button was hit
+    console.log('submit button hit');
+    let str = document.getElementById('name').value;
+    let perms = allArrangements(str);
+    let words = getWords(perms);
+    let html = '';
+    for (let i = 0; i < words.length; i++) {
+        html += words[i] + '<br>';
+    }
+    document.getElementById('output').innerHTML = html;
+    // display the words to console too
+    console.log(words);
+}

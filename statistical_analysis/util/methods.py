@@ -1,5 +1,31 @@
 import itertools
+import time
 from pprint import pprint
+
+
+def progress_bar(current, total, bar_length=20):
+    """
+    Print a progress bar
+    :param current: current value
+    :param total: total value
+    :param bar_length: length of progress bar
+    :return: None
+    """
+    percent = float(current) * 100 / total
+    arrow = '-' * int(percent / 100 * bar_length - 1) + '>'
+    spaces = ' ' * (bar_length - len(arrow))
+    print('Progress: [{0}] {1}%'.format(arrow + spaces, int(percent)), end='\r')
+
+
+def process_running_spinner():
+    """
+    Print a spinner to show that a process is running
+    :return: None
+    """
+    spinner = itertools.cycle(['-', '/', '|', '\\'])
+    for _ in range(100):
+        print(next(spinner), end='\r')
+        time.sleep(0.1)
 
 
 def load_words_from_file(file_path):
@@ -56,10 +82,9 @@ def make_words_from_string(string, display=False):
             print(words[i:i + 15])
         print("Total permutations: {}".format(len(permutations)))
         print("Total words: {}".format(len(words)))
-    # check if each permutation is a word in the dictionary of words
 
 
 # test the mwke_words_from_string function
 
-string = 'ryanzurrin'
+string = 'davidgiblinj'
 make_words_from_string(string, display=True)

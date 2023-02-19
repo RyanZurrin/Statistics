@@ -21,18 +21,13 @@
             <h1>Name to Words Generator</h1>
         </div>
         <div class="content">
-            <div class="form">
-                <!-- <form action uses all front end browser side/ calls the scrpts in scrpt.js -->
-                <form action="backend/index.php" method="POST">
-                    <input type="text" name="name" placeholder="Enter your name">
-                    <input type="submit" value="Generate">
-                </form>
+            <div class="input">
+                <input type="text" id="name" placeholder="Enter your name">
+                <button onclick="submitNameHit()" id="submit">Submit</button>
             </div>
-            <div class="result">
-                <h2>Result</h2>
-                <div class="result-content">
-                    <p id="result"></p>
-                </div>
+            <div class="output">
+                <h2>Output</h2>
+                <div id="output"></div>
             </div>
         </div>
     </div>
