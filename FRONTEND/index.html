@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Name to Words Generator</title>
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- description -->
+    <meta name="description" content="Name to Words Generator">
+
+    <!-- keywords -->
+    <meta name="keywords" content="Name to Words Generator">
+
+    <!-- author -->
+    <meta name="Ryan Zurrin" content="Name to Words Generator">
+
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Name to Words Generator</h1>
+        </div>
+        <div class="content">
+            <div class="form">
+                <!-- <form action uses all front end browser side/ calls the scrpts in scrpt.js -->
+                <form action="backend/index.php" method="POST">
+                    <input type="text" name="name" placeholder="Enter your name">
+                    <input type="submit" value="Generate">
+                </form>
+            </div>
+            <div class="result">
+                <h2>Result</h2>
+                <div class="result-content">
+                    <p id="result"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+    <script src="js/jquery-3.6.3.min.js"></script>
+    <script src="js/script.js"></script>
+</html>

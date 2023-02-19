@@ -1,0 +1,31 @@
+/* style for word generator front end */
+body {
+    background-color: #f2f2f2;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    font-size: 2.5em;
+    font-weight: 300;
+    margin: 0;
+    padding: 0;
+}
+
+h2 {
+    font-size: 1.5em;
+    font-weight: 300;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
