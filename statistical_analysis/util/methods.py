@@ -1,8 +1,9 @@
 import itertools
+import math
 import time
-from pprint import pprint
+import tqdm
 import progressbar
-import resource
+
 
 def load_words_from_file(file_path):
     """
@@ -28,6 +29,30 @@ def is_word(word, words):
     return word in words
 
 
+def nPr(n, r):
+    """
+    Calculate the number of permutations of n objects taken r at a time
+    :param n: number of objects
+    :param r: number of objects taken at a time
+    :return: number of permutations
+    """
+    return int(math.factorial(n) / math.factorial(n - r))
+
+
+def total_arrangements(n):
+    """
+    Calculate the total number of arrangements of n objects so if a string has
+    6 letters then the total would be:
+    nP1 + nP2 + nP3 + nP4 + nP5 + nP6
+    :param n: number of objects
+    :return: total number of arrangements
+    """
+    total = 0
+    for i in range(1, n + 1):
+        total += nPr(n, i)
+    return total
+
+
 def make_words_from_string(string, display=False):
     """
     Make a list of all permutations of a string of characters and then check if
@@ -38,38 +63,27 @@ def make_words_from_string(string, display=False):
 
     """
     t0 = time.perf_counter()
+    # remove all non-alphabetic characters and make all the letters lowercase
+    string = ''.join([char for char in string if char.isalpha()]).lower()
 
-    # add progress bar to show how many permutations have been checked
-    progress = progressbar.ProgressBar()
-    widgets = [
-        ' [', progressbar.Timer(), '] ',
-        progressbar.Bar(),
-        ' (', progressbar.ETA(), ') ',
-        ]
+    # print the number of arrangements that will be checked
+    counter = total_arrangements(len(string))
+    if display:
+        print(f'Checking {counter} arrangements')
 
-
-    # remove any spaces and make all the letters lowercase inplace
-    string = string.replace(' ', '').lower()
-
+    # load the dictionary of words
     words_dict = load_words_from_file('words.txt')
-    # check the permutations while they are being generated and if they are a
-    # word in the dictionary then add them to the list of words if not then
-    # discard them so that larger names can be processed
 
-    # make all possible permutations of the string of characters using itertools and use a progress bar to show how many permutations have been checked
-    words = [
-        ''.join(permutation) for i in progress(range(1, len(string) + 1))
-        for permutation in itertools.permutations(string, i)
-        if ''.join(permutation) in words_dict
-    ]
+    # add the permutations that are words to a list while generating them and
+    # use a progress bar to show the progress
+    words = []
+    for i in range(1, len(string) + 1):
+        for perm in tqdm.tqdm(itertools.permutations(string, i),
+                              total=nPr(len(string), i)):
+            word = ''.join(perm)
+            if is_word(word, words_dict):
+                words.append(word)
 
-
-
-    # words = [
-    #     ''.join(permutation) for i in range(1, len(string) + 1)
-    #     for permutation in itertools.permutations(string, i)
-    #     if ''.join(permutation) in words_dict
-    # ]
 
     # now remove duplicates and sort alphabetically
     words = sorted(list(set(words)))
@@ -78,17 +92,16 @@ def make_words_from_string(string, display=False):
         # print the list of words so that there is a new line every 15 words
         for i in range(0, len(words), 15):
             print(words[i:i + 15])
-        print("Total permutations: {}".format(len(words)))
-        print("Total words: {}".format(len(words)))
+        print("Total permutations checked: {}".format(counter))
+        print("Total words found: {}".format(len(words)))
 
     t1 = time.perf_counter()
     print("Time taken: {}".format(t1 - t0))
-    memMB = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
-    print("Memory used: {} MB".format(memMB))
 
     return words
 
 
-string = 'David Giblin Jr'
+if __name__ == '__main__':
+    string = 'RyanZurrin'
 
-make_words_from_string(string, display=True)
+    make_words_from_string(string, display=True)
