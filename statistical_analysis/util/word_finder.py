@@ -11,17 +11,19 @@ parser.add_argument('string', help='string of characters')
 # path to dictionary of words uses default words.txt
 parser.add_argument('-p', '--path', help='path to dictionary of words',
                     default=WORDS_PATH)
+parser.add_argument('-d', '--display', help='display the number of arrangements',
+                    action='store_true')
 args = parser.parse_args()
 
 
 class WordFinder:
 
-    def __init__(self, target_word, dict_path="words.txt"):
+    def __init__(self, target_word, dict_path="words.txt", display=False):
         self.target_word = target_word
         self.dict_path = dict_path
         self.words_dict = self.load_words_from_file(dict_path)
         self.counter = self.total_arrangements(len(target_word))
-        self.words = self.make_words_from_string(target_word, display=False)
+        self.words = self.make_words_from_string(target_word, display=display)
 
     @staticmethod
     def load_words_from_file(file_path):
@@ -122,5 +124,5 @@ class WordFinder:
 
 
 if __name__ == '__main__':
-    word_finder = WordFinder(args.string, args.path)
+    word_finder = WordFinder(args.string, args.path, args.display)
     print(word_finder.get_words())
