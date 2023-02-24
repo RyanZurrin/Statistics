@@ -1,5 +1,6 @@
 import itertools
 import math
+import random
 import time
 import argparse
 import tqdm
@@ -11,7 +12,8 @@ parser.add_argument('string', help='string of characters')
 # path to dictionary of words uses default words.txt
 parser.add_argument('-p', '--path', help='path to dictionary of words',
                     default=WORDS_PATH)
-parser.add_argument('-d', '--display', help='display the number of arrangements',
+parser.add_argument('-d', '--display',
+                    help='display the number of arrangements',
                     action='store_true')
 args = parser.parse_args()
 
@@ -22,8 +24,8 @@ class WordFinder:
         self.target_word = target_word
         self.dict_path = dict_path
         self.words_dict = self.load_words_from_file(dict_path)
-        self.counter = self.total_arrangements(len(target_word))
-        self.words = self.make_words_from_string(target_word, display=display)
+        self._counter = self.total_arrangements(len(target_word))
+        self._words = self.make_words_from_string(target_word, display=display)
 
     @staticmethod
     def load_words_from_file(file_path):
@@ -80,6 +82,7 @@ class WordFinder:
         each permutation is a word in the dictionary of words and return the list of
         words that are in the dictionary
         :param string: string of characters
+        :param display: display the words found and the number of arrangements checked
         :return: list of words that are in the dictionary
 
         """
@@ -119,10 +122,13 @@ class WordFinder:
 
         return words
 
-    def get_words(self):
-        return self.words
+    def words(self):
+        return self._words
+
+    def counter(self):
+        return self._counter
 
 
 if __name__ == '__main__':
     word_finder = WordFinder(args.string, args.path, args.display)
-    print(word_finder.get_words())
+    print(word_finder.words())
