@@ -5,17 +5,6 @@ import time
 import argparse
 import tqdm
 
-WORDS_PATH = 'words.txt'
-# use argspars to take in the string and path to dictionary of words
-parser = argparse.ArgumentParser()
-parser.add_argument('string', help='string of characters')
-# path to dictionary of words uses default words.txt
-parser.add_argument('-p', '--path', help='path to dictionary of words',
-                    default=WORDS_PATH)
-parser.add_argument('-d', '--display',
-                    help='display the number of arrangements',
-                    action='store_true')
-args = parser.parse_args()
 
 
 class WordFinder:
@@ -130,5 +119,17 @@ class WordFinder:
 
 
 if __name__ == '__main__':
+    WORDS_PATH = 'words.txt'
+    # use argspars to take in the string and path to dictionary of words
+    parser = argparse.ArgumentParser()
+    parser.add_argument('string', help='string of characters')
+    # path to dictionary of words uses default words.txt
+    parser.add_argument('-p', '--path', help='path to dictionary of words',
+                        default=WORDS_PATH)
+    parser.add_argument('-d', '--display',
+                        help='display the number of arrangements',
+                        action='store_true')
+    args = parser.parse_args()
+
     word_finder = WordFinder(args.string, args.path, args.display)
     print(word_finder.words())
