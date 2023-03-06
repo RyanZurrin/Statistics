@@ -113,6 +113,29 @@ class Probabilify(Statify):
         """
         self.__data = data
 
+    def LOTUS(self, other):
+        """
+        LOTUS of two sample spaces
+        :param other: the other sample space
+        :return: the LOTUS of the two sample spaces
+        """
+        # create a new sample space
+        sample_space = list(set(self.sample_space) | set(other.sample_space))
+        # create a new Probabilify object
+        new_prob = Probabilify(sample_space)
+        return new_prob
+
+    def expected_value(self):
+        """
+        Calculates the expected value of the data set
+        :return: the expected value of the data set
+        """
+        # calculate the expected value
+        expected_value = 0
+        for value in self.data:
+            expected_value += value
+        return expected_value / len(self.data)
+
     def remove_sample(self, sample):
         """
         Removes a sample from the sample space in place
@@ -720,3 +743,4 @@ class Probabilify(Statify):
         # calculate P(B|A)
         p_b_given_a = (p_a_given_b * p_b) / p_a
         return p_b_given_a
+

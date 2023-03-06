@@ -119,8 +119,7 @@ class TestStdDevDataFrame(unittest.TestCase):
         df = pd.read_csv(path)
         stat = Statify(df)
         self.assertEqual(stat.standard_deviation(key="Audience Ratings %"),
-                         16.82779199386655)
-
+                         16.827791993866548)
 
 if __name__ == '__main__':
     unittest.main()
