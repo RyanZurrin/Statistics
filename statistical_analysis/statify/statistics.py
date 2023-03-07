@@ -46,7 +46,46 @@ class Statify(object):
         if isinstance(self._data, pd.DataFrame):
             # use the key to calculate mean of df
             return self._data[key].mean()
-        return sum(self._data) / len(self._data)
+        elif isinstance(self._data, dict):
+            # return the mean of the values in the dict
+            return sum(self._data.values()) / len(self._data)
+        elif isinstance(self._data, tuple):
+            # return the mean of the values in the tuple
+            return sum(self._data) / len(self._data)
+        # if it is a list of tuples
+        elif isinstance(self._data, list) and isinstance(self._data[0], tuple):
+            # iterate through the list of tuples and sum the values
+            total = 0
+            for t in self._data:
+                total += sum(t)
+            # return the mean of the values in the list of tuples
+            return total / len(self._data)
+        # if it is a list of lists
+        elif isinstance(self._data, list) and isinstance(self._data[0], list):
+            # iterate through the list of lists and sum the values
+            total = 0
+            for l in self._data:
+                total += sum(l)
+            # return the mean of the values in the list of lists
+            return total / len(self._data)
+        # if it is a list of dicts
+        elif isinstance(self._data, list) and isinstance(self._data[0], dict):
+            # iterate through the list of dicts and sum the values
+            total = 0
+            for d in self._data:
+                total += sum(d.values())
+            # return the mean of the values in the list of dicts
+            return total / len(self._data)
+        # if it is a list of sets
+        elif isinstance(self._data, list) and isinstance(self._data[0], set):
+            # iterate through the list of sets and sum the values
+            total = 0
+            for s in self._data:
+                total += sum(s)
+            # return the mean of the values in the list of sets
+            return total / len(self._data)
+        else:
+            return sum(self._data) / len(self._data)
 
     def trimmed_mean(self, key=False, percent=0.1):
         if isinstance(self._data, pd.DataFrame):

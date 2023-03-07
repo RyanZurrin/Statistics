@@ -14,10 +14,12 @@ from statistical_analysis.statify import Statify
 class Probabilify(Statify):
 
     def __init__(self, data):
-        super().__init__(data)
+
         self.__data = data
         # create the sample space from the data set
         self.sample_space = self.create_sample_space()
+        self.probability_distribution = self.__create_probability_distribution()
+        super().__init__(self.sample_space)
 
     def __add__(self, other):
         """
@@ -113,6 +115,38 @@ class Probabilify(Statify):
         """
         self.__data = data
 
+
+    def __create_probability_distribution(self):
+        """
+        Creates a probability distribution from the sample space
+        """
+        # create a dictionary to store the probability distribution
+        probability_distribution = {}
+        # loop through the sample space
+        for sample in self.sample_space:
+            # get the probability of the sample
+            probability = self.probability_of_outcomes(self.sample_space,
+                                                       sample)
+            # add the sample and probability to the dictionary
+            probability_distribution[sample] = probability
+        # return the probability distribution
+        return probability_distribution
+
+    def get_probability_distribution(self, Y, prob_fx):
+        """
+        Creates a probability distribution from the sample space
+        """
+        prob_dist = {}
+        for y in Y:
+            prob_dist[y] = 0
+            for x in self.sample_space:
+                if prob_fx(x, y):
+                    prob_dist[y] += 1
+        for y in Y:
+            prob_dist[y] /= len(self.sample_space)
+
+        return prob_dist
+
     def LOTUS(self, other):
         """
         LOTUS of two sample spaces
@@ -130,11 +164,19 @@ class Probabilify(Statify):
         Calculates the expected value of the data set
         :return: the expected value of the data set
         """
-        # calculate the expected value
+        # calculate the expected value from the sample space
         expected_value = 0
-        for value in self.data:
-            expected_value += value
-        return expected_value / len(self.data)
+        for value in self.sample_space:
+            # if the value is a number, add it to the expected value if it is a tuple or array add the first element
+            if isinstance(value, (int, float)):
+                expected_value += value
+            elif isinstance(value, (tuple, list)):
+                # sum the elements of the tuple or array
+                expected_value += sum(value)
+            elif isinstance(value, dict):
+                # sum the values of the dictionary
+                expected_value += sum(value.values())
+        return expected_value / len(self.sample_space)
 
     def remove_sample(self, sample):
         """
@@ -269,7 +311,8 @@ class Probabilify(Statify):
         if replacement:
             permutations = n ** r
         else:
-            permutations = Probabilify.factorial(n) / Probabilify.factorial(n - r)
+            permutations = Probabilify.factorial(n) / Probabilify.factorial(
+                n - r)
             return permutations
 
     @staticmethod
@@ -315,20 +358,22 @@ class Probabilify(Statify):
         probability = len(value) / len(data)
         return probability
 
-    def get_sample_space(self,
-                         observations,
-                         outcomes=None,
-                         replacement=False,
-                         duplicates=True,
-                         flatten=False,
-                         display=True):
+    def define_sample_space(self,
+                     observations,
+                     outcomes=None,
+                     replacement=False,
+                     duplicates=True,
+                     flatten=False,
+                     display=False):
         """
         Calculates the sample space for a given number of observations and outcomes
+        and sets the samples space of the object to the new sample space
 
         :param observations: the number of observations
         :param outcomes: list of possible outcomes
         :param replacement: whether the observations are taken with replacement
         :param duplicates: whether the observations can contain duplicates
+        :param flatten:  whether to flatten the sample space
         :param display: whether to display the sample space
         :return: the sample space
         """
@@ -356,6 +401,13 @@ class Probabilify(Statify):
                 print(sample_space[i:i + 10])
             # print the total number of outcomes
             print(f'Cardinality of sample space S is : {len(sample_space)}')
+            
+        self.sample_space = sample_space
+        # update super class
+        super().__init__(sample_space)
+        # set the probability distribution
+        self.probability_distribution = self.__create_probability_distribution()
+
 
         return sample_space
 
@@ -520,7 +572,7 @@ class Probabilify(Statify):
                                 outcome,
                                 keep_position=False,
                                 replacement=False,
-                                display=True):
+                                display=False):
         """
         Calculates the probability of a given outcomes, can use ? as a wildcard in
         the outcome strings
@@ -619,7 +671,6 @@ class Probabilify(Statify):
                 count += 1
         return count / len(ss)
 
-
     def complement(self) -> 'Probabilify':
         """
         Returns the complement of the probability space
@@ -700,7 +751,7 @@ class Probabilify(Statify):
         return power
 
     @staticmethod
-    def simulate_experiment(experiment, trials, display=True):
+    def simulate_experiment(experiment, trials, display=False):
         """
         Simulates an experiment
         :param experiment: the experiment to simulate
