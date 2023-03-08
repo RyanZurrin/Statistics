@@ -1,0 +1,92 @@
+---
+title: "Expected Values"
+author: "MATH 345"
+date: "Fall 2022"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This note shows how to create R functions to calculate expected values of random variables (r.v.) and functions thereof.
+
+## 1. Function definitions
+
+**Function to calculate the expected value of a random variable**
+
+Inputs: `y`: possible values of the r.v.; `py`: associated probabilities $p(y) = P(Y = y)$.
+
+Output: Expected value $E(Y) = \sum_{y} y p(y)$
+
+```{r, expected value}
+E <- function(y, py)
+{
+	stopifnot(length(y) == length(py))
+	out <- sum(y * py)
+	out
+}
+```
+
+Note: you can use the command `return` at the end of a function to tell R to return a value (for example, `return(out` in the function above) but it's not necessary. If the last line is just the name of an object, R will know to return it.
+
+**Function to calculate the variance of a random variable**
+
+Inputs: `y`: possible values of the r.v.; `py`: associated probabilities $p(y) = P(Y = y)$.
+
+Output: Variance $V(Y) = \sum_{y} ((y-\mu)^2 p(y))$ where $\mu = E(Y)$.
+
+```{r}
+V <- function(y, py) {
+	mu <- E(y, py)
+	sum((y-mu)^2 * py)
+}
+```
+
+**Function to calculate the expected value of a function of a random variable**
+
+Inputs: `y`: possible values of the r.v.; `py`: associated probabilities $p(y) = P(Y = y)$; `g`: function (should be able to take vector inputs).
+
+Output: $E(g(Y)) = \sum_{y} g(y) p(y)$
+
+```{r, LOTUS}
+EgY <- function(y, py, g) sum(g(y) * py)
+```
+
+-   Note: if a function definition holds in one line, there's no need to put squiggly brackets {} around it
+-   Law Of The Unconscious Statistician (LOTUS): <https://en.wikipedia.org/wiki/Law_of_the_unconscious_statistician>
+
+## 2. Example: Textbook exercise 3.12
+
+Probability table:
+
+```{r}
+p <- c(.4, .3, .2, .1)
+y <- 1:4
+```
+
+Expected value of $Y$:
+```{r}
+E(y, p) 
+```
+Note: as in other programming languages, when you *call* a function on some R variables (here `y` and `p`), these variables do not need to have the same names as those used to *define* the function (here `y` and `py`).
+
+Expected value of inverse of Y ($E(1/Y)$):
+
+```{r}
+g1 <- function(y) 1/y
+EgY(y, p, g1)  
+```
+
+Expected value $E(Y^2 - 1)$:
+```{r}
+g2 <- function(y) y^2 - 1
+EgY(y, p, g2)
+```
+
+Variance of $Y$ ($V(Y)$):
+```{r}
+V(y, p) 
+```

@@ -115,7 +115,6 @@ class Probabilify(Statify):
         """
         self.__data = data
 
-
     def __create_probability_distribution(self):
         """
         Creates a probability distribution from the sample space
@@ -159,24 +158,23 @@ class Probabilify(Statify):
         new_prob = Probabilify(sample_space)
         return new_prob
 
-    def expected_value(self):
+    def expected_value(self, Y=None, prob_fx=None):
         """
         Calculates the expected value of the data set
         :return: the expected value of the data set
         """
         # calculate the expected value from the sample space
+        if Y is None:
+            Y = self.sample_space
+        if prob_fx is None:
+            prob_fx = self.probability_of_outcomes
+        prob_dist = self.get_probability_distribution(Y, prob_fx)
         expected_value = 0
-        for value in self.sample_space:
-            # if the value is a number, add it to the expected value if it is a tuple or array add the first element
-            if isinstance(value, (int, float)):
-                expected_value += value
-            elif isinstance(value, (tuple, list)):
-                # sum the elements of the tuple or array
-                expected_value += sum(value)
-            elif isinstance(value, dict):
-                # sum the values of the dictionary
-                expected_value += sum(value.values())
-        return expected_value / len(self.sample_space)
+        for y in Y:
+            # print("y: {}, prob_dist[y]: {}".format(y, prob_dist[y]))
+            expected_value += y * prob_dist[y]
+        return expected_value
+
 
     def remove_sample(self, sample):
         """
@@ -359,12 +357,12 @@ class Probabilify(Statify):
         return probability
 
     def define_sample_space(self,
-                     observations,
-                     outcomes=None,
-                     replacement=False,
-                     duplicates=True,
-                     flatten=False,
-                     display=False):
+                            observations,
+                            outcomes=None,
+                            replacement=False,
+                            duplicates=True,
+                            flatten=False,
+                            display=False):
         """
         Calculates the sample space for a given number of observations and outcomes
         and sets the samples space of the object to the new sample space
@@ -401,13 +399,12 @@ class Probabilify(Statify):
                 print(sample_space[i:i + 10])
             # print the total number of outcomes
             print(f'Cardinality of sample space S is : {len(sample_space)}')
-            
+
         self.sample_space = sample_space
         # update super class
         super().__init__(sample_space)
         # set the probability distribution
         self.probability_distribution = self.__create_probability_distribution()
-
 
         return sample_space
 
@@ -794,4 +791,3 @@ class Probabilify(Statify):
         # calculate P(B|A)
         p_b_given_a = (p_a_given_b * p_b) / p_a
         return p_b_given_a
-
