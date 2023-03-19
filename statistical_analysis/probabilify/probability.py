@@ -1,7 +1,8 @@
 import itertools
+import math
 import random
 from pprint import pprint
-
+from rpy2 import robjects as ro
 from tabulate import tabulate
 
 from statistical_analysis.statify import Statify
@@ -174,7 +175,6 @@ class Probabilify(Statify):
             # print("y: {}, prob_dist[y]: {}".format(y, prob_dist[y]))
             expected_value += y * prob_dist[y]
         return expected_value
-
 
     def remove_sample(self, sample):
         """
@@ -791,3 +791,17 @@ class Probabilify(Statify):
         # calculate P(B|A)
         p_b_given_a = (p_a_given_b * p_b) / p_a
         return p_b_given_a
+
+    @staticmethod
+    def binomial_distribution(q, size, prob, lower_tail=True, log_p=False):
+        """
+        Returns the binomial distribution
+        :param q: the number of successes
+        :param size: the number of trials
+        :param prob: the probability of success
+        :param lower_tail: whether to return the lower tail
+        :param log_p: whether to return the log of the probability
+        :return: the binomial distribution
+        """
+        # call the R binomial distribution using rpy2
+        return ro.r['pbinom'](q, size, prob, lower_tail, log_p)
