@@ -44,5 +44,5 @@ from statify import Statify
 # # mean of the probability distribution
 # print(balls.expected_value(Y, prob_func))
 
-print(Probabilify.binomial_distribution(3, 20, .05))
+print(Probabilify.dbinom(8, 50, .3))
 

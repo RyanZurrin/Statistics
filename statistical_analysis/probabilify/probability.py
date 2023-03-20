@@ -793,7 +793,7 @@ class Probabilify(Statify):
         return p_b_given_a
 
     @staticmethod
-    def binomial_distribution(q, size, prob, lower_tail=True, log_p=False):
+    def pbinom(q, size, prob, lower_tail=True, log_p=False):
         """
         Returns the binomial distribution
         :param q: the number of successes
@@ -805,3 +805,122 @@ class Probabilify(Statify):
         """
         # call the R binomial distribution using rpy2
         return ro.r['pbinom'](q, size, prob, lower_tail, log_p)
+
+    @staticmethod
+    def dbinom(q, size, prob, log=False):
+        """
+        Returns the binomial distribution
+        :param q: the number of successes
+        :param size: the number of trials
+        :param prob: the probability of success
+        :param log: whether to return the log of the probability
+        :return: the binomial distribution
+        """
+        # call the R binomial distribution using rpy2
+        return ro.r['dbinom'](q, size, prob, log)
+
+    @staticmethod
+    def pnorm(q, mean=0, sd=1, lower_tail=True, log_p=False):
+        """
+        Returns the normal distribution
+        :param q: the number of successes
+        :param mean: the mean of the normal distribution
+        :param sd: the standard deviation of the normal distribution
+        :param lower_tail: whether to return the lower tail
+        :param log_p: whether to return the log of the probability
+        :return: the normal distribution
+        """
+        # call the R normal distribution using rpy2
+        return ro.r['pnorm'](q, mean, sd, lower_tail, log_p)
+
+    @staticmethod
+    def dnorm(q, mean=0, sd=1, log=False):
+        """
+        Returns the normal distribution
+        :param q: the number of successes
+        :param mean: the mean of the normal distribution
+        :param sd: the standard deviation of the normal distribution
+        :param log: whether to return the log of the probability
+        :return: the normal distribution
+        """
+        # call the R normal distribution using rpy2
+        return ro.r['dnorm'](q, mean, sd, log)
+
+    @staticmethod
+    def ppois(q, lambda_, lower_tail=True, log_p=False):
+        """
+        Returns the poisson distribution
+        :param q: the number of successes
+        :param lambda_: the number of trials
+        :param lower_tail: whether to return the lower tail
+        :param log_p: whether to return the log of the probability
+        :return: the poisson distribution
+        """
+        # call the R poisson distribution using rpy2
+        return ro.r['ppois'](q, lambda_, lower_tail, log_p)
+
+    @staticmethod
+    def dpois(q, lambda_, log=False):
+        """
+        Returns the poisson distribution
+        :param q: the number of successes
+        :param lambda_: the number of trials
+        :param log: whether to return the log of the probability
+        :return: the poisson distribution
+        """
+        # call the R poisson distribution using rpy2
+        return ro.r['dpois'](q, lambda_, log)
+
+    @staticmethod
+    def pgeom(q, prob, lower_tail=True, log_p=False):
+        """
+        Returns the geometric distribution
+        :param q: the number of successes
+        :param prob: the probability of success
+        :param lower_tail: whether to return the lower tail
+        :param log_p: whether to return the log of the probability
+        :return: the geometric distribution
+        """
+        # call the R geometric distribution using rpy2
+        return ro.r['pgeom'](q, prob, lower_tail, log_p)
+
+    @staticmethod
+    def dgeom(q, prob, log=False):
+        """
+        Returns the geometric distribution
+        :param q: the number of successes
+        :param prob: the probability of success
+        :param log: whether to return the log of the probability
+        :return: the geometric distribution
+        """
+        # call the R geometric distribution using rpy2
+        return ro.r['dgeom'](q, prob, log)
+
+    @staticmethod
+    def phyper(q, m, n, k, lower_tail=True, log_p=False):
+        """
+        Returns the hypergeometric distribution
+        :param q: the number of successes
+        :param m: the number of successes in the population
+        :param n: the number of failures in the population
+        :param k: the number of draws
+        :param lower_tail: whether to return the lower tail
+        :param log_p: whether to return the log of the probability
+        :return: the hypergeometric distribution
+        """
+        # call the R hypergeometric distribution using rpy2
+        return ro.r['phyper'](q, m, n, k, lower_tail, log_p)
+
+    @staticmethod
+    def dhyper(q, m, n, k, log=False):
+        """
+        Returns the hypergeometric distribution
+        :param q: the number of successes
+        :param m: the number of successes in the population
+        :param n: the number of failures in the population
+        :param k: the number of draws
+        :param log: whether to return the log of the probability
+        :return: the hypergeometric distribution
+        """
+        # call the R hypergeometric distribution using rpy2
+        return ro.r['dhyper'](q, m, n, k, log)
