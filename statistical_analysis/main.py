@@ -43,6 +43,9 @@ from statify import Statify
 #
 # # mean of the probability distribution
 # print(balls.expected_value(Y, prob_func))
+y = 3
+probability = 0.042
+initial_guess = 6
 
-print(Probabilify.dbinom(8, 50, .3))
-
+lambda_estimate = Probabilify.newton_raphson(y, probability, initial_guess)
+print(f"The estimated lambda value for P(Y={y}) = {probability} is: {lambda_estimate:.2f}")

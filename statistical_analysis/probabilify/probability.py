@@ -2,6 +2,8 @@ import itertools
 import math
 import random
 from pprint import pprint
+
+import numpy as np
 from rpy2 import robjects as ro
 from tabulate import tabulate
 
@@ -791,6 +793,29 @@ class Probabilify(Statify):
         # calculate P(B|A)
         p_b_given_a = (p_a_given_b * p_b) / p_a
         return p_b_given_a
+
+    @staticmethod
+    def poisson_probability(y, lambda_value):
+        return (np.exp(-lambda_value) * (
+                lambda_value ** y)) / np.math.factorial(y)
+
+    @staticmethod
+    def newton_raphson(y, target_probability, initial_guess, max_iterations=100,
+                       tolerance=1e-6):
+        lambda_value = initial_guess
+
+        for _ in range(max_iterations):
+            f_value = Probabilify.poisson_probability(y,
+                                                      lambda_value) - target_probability
+            f_derivative = Probabilify.poisson_probability(y, lambda_value) * (
+                    y / lambda_value - 1)
+
+            if abs(f_value) < tolerance:
+                return lambda_value
+
+            lambda_value -= f_value / f_derivative
+
+        raise ValueError("Newton-Raphson method did not converge.")
 
     @staticmethod
     def pbinom(q, size, prob, lower_tail=True, log_p=False):
