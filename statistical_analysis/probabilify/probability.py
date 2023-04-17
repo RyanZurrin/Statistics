@@ -859,6 +859,20 @@ class Probabilify(Statify):
         return ro.r['pnorm'](q, mean, sd, lower_tail, log_p)
 
     @staticmethod
+    def qnorm(p, mean=0, sd=1, lower_tail=True, log_p=False):
+        """
+        Returns the normal distribution
+        :param p: the number of successes
+        :param mean: the mean of the normal distribution
+        :param sd: the standard deviation of the normal distribution
+        :param lower_tail: whether to return the lower tail
+        :param log_p: whether to return the log of the probability
+        :return: the normal distribution
+        """
+        # call the R normal distribution using rpy2
+        return ro.r['qnorm'](p, mean, sd, lower_tail, log_p)
+
+    @staticmethod
     def dnorm(q, mean=0, sd=1, log=False):
         """
         Returns the normal distribution
@@ -868,8 +882,10 @@ class Probabilify(Statify):
         :param log: whether to return the log of the probability
         :return: the normal distribution
         """
-        # call the R normal distribution using rpy2
-        return ro.r['dnorm'](q, mean, sd, log)
+        sqrt_2_pi = math.sqrt(2 * math.pi)
+        exponent = -0.5 * ((q - mean) / sd) ** 2
+        pdf_value = (1 / (sd * sqrt_2_pi)) * math.exp(exponent)
+        return pdf_value
 
     @staticmethod
     def ppois(q, lambda_, lower_tail=True, log_p=False):

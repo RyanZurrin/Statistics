@@ -56,4 +56,4 @@ ggplot(wine, aes(x=Alcohol, y=Color.intensity, color=Class)) + geom_point()
 library(plotly)
 ggplotly(ggplot(wine, aes(x=Alcohol, y=Color.intensity, z=Flavanoids, color=Class)) + geom_point())
 
-
+qnorm(0.975)
