@@ -1,7 +1,7 @@
 # check working directory
 getwd()
 # set working directory
-setwd('D:/src/python/Statistics/homeworks/final_project')
+setwd('D:/src/PycharmProjects/Statistics/homeworks/final_project')
 
 # import the cdc_90519_DS1.csv file into a dataframe
 cdc <- read.csv('cdc_90519_DS1.csv', header=TRUE)
@@ -38,3 +38,6 @@ vaccination <- read.csv('vaccination-data.csv', header=TRUE)
 
 # print the structure of the dataframe
 str(vaccination)
+
+# print total_deaths of owid
+owid$total_deaths
