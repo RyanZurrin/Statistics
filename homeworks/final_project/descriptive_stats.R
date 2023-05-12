@@ -5,6 +5,7 @@ library(ggplot2)
 
 summary(kaggle_preexisting)
 str(kaggle_preexisting)
+str(cleaned_preexisting)
 
 # > str(kaggle_preexisting)
 # 'data.frame':	566602 obs. of  23 variables:
@@ -88,6 +89,7 @@ data <- data %>%
   mutate(intubated_binary = ifelse(intubed == 1, 1, 0),
          death_binary = ifelse(date_died != "9999-99-99", 1, 0))
 
+
 # Fit logistic regression models
 model_hospitalization <- glm(hospitalized ~ age + gender + diabetes + hypertension + cardiovascular, data = data, family = "binomial")
 model_intubation <- glm(intubated_binary ~ age + gender + diabetes + hypertension + cardiovascular, data = data, family = "binomial")
@@ -102,6 +104,17 @@ library(ggplot2)
 
 logistic_plot <- plot_model_coefficients(model_hospitalization, "Hospitalization Model Coefficients")
 print(logistic_plot)
+
+logistic_plot <- plot_model_coefficients(model_intubation, "Intubation Model Coefficients")
+print(logistic_plot)
+
+logistic_plot <- plot_model_coefficients(model_death, "Death Model Coefficients")
+print(logistic_plot)
+
+
+
+
+
 kaggle_preexisting$died <- ifelse(kaggle_preexisting$date_died == '9999-99-99', 0, 1)
 kaggle_numeric <- kaggle_preexisting %>%
   select_if(is.numeric)
@@ -112,7 +125,7 @@ library(corrplot)
 
 # Select only numeric columns
 numeric_data <- kaggle_preexisting[sapply(kaggle_preexisting, is.numeric)]
-
+numeric_cleaned <- cleaned_preexisting[sapply(cleaned_preexisting, is.numeric)]
 # Compute correlation matrix
 cor_mat <- cor(numeric_data, use = "pairwise.complete.obs")
 
@@ -152,6 +165,28 @@ corrplot(cor_mat_spearman,
 )
 # add title
 title("Spearman's Rho Correlation Matrix", line = 3.2, cex.main = 1.5)
+
+# Create a correlation matrix using Spearman's rank correlation using the cleaned_preexisting data
+cor_mat_spearman_cleaned <- cor(numeric_cleaned, use = "pairwise.complete.obs", method = "spearman")
+print(cor_mat_spearman_cleaned)
+
+corrplot(cor_mat_spearman_cleaned,
+         method = "circle",
+         type = "upper",
+         tl.cex = 0.75,
+         tl.col = "black",
+         tl.srt = 45,
+         tl.offset = 0.5,
+         number.cex = 0.75,
+         addCoef.col = "black",
+         addCoefasPercent = TRUE,
+         col = colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))(200),
+)
+# add title
+title("Spearman's Rho Correlation Matrix", line = 3.0, cex.main = 1.5)
+
+
+
 
 # Subsetting the data
 data_male <- subset(kaggle_preexisting, gender == "male")
