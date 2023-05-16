@@ -1,3 +1,7 @@
-# R Class for performing descriptive statistics on a data frame
+# Use the R6 class to create a descriptive statistics object
 
-# Input: data frame
+# Load packages
+library(R6)
+library(dplyr)
+
+# Create a class for descriptive statistics
