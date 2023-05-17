@@ -22,4 +22,4 @@ latest_data_owid <- ordered_data %>% group_by(location) %>% slice(1)
 str(latest_data)
 
 # save the latest_data_owid dataframe to a csv file
-write.csv(latest_data_owid, file = "datasets/latest_data_owid.csv")
+write.csv(latest_data_owid, file = "../datasets/latest_data_owid.csv")
