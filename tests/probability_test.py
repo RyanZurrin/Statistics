@@ -2,7 +2,7 @@ import unittest
 # append the parent directory to the path
 import sys, os
 
-sys.path.append(os.path.realpath((os.path.dirname(__file__) + '/../')))
+sys.path.append(os.path.realpath(f'{os.path.dirname(__file__)}/../'))
 from statistical_analysis.probabilify import Probabilify
 
 dice1 = [1, 2, 3, 4, 5, 6]

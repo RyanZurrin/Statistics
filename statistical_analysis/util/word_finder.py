@@ -59,10 +59,7 @@ class WordFinder:
         :param n: number of objects
         :return: total number of arrangements
         """
-        total = 0
-        for i in range(1, n + 1):
-            total += WordFinder.nPr(n, i)
-        return total
+        return sum(WordFinder.nPr(n, i) for i in range(1, n + 1))
 
     @staticmethod
     def make_words_from_string(string, display=False):
@@ -103,11 +100,11 @@ class WordFinder:
             # print the list of words so that there is a new line every 15 words
             for i in range(0, len(words), 15):
                 print(words[i:i + 15])
-            print("Total permutations checked: {}".format(counter))
-            print("Total words found: {}".format(len(words)))
+            print(f"Total permutations checked: {counter}")
+            print(f"Total words found: {len(words)}")
 
         t1 = time.perf_counter()
-        print("Time taken: {}".format(t1 - t0))
+        print(f"Time taken: {t1 - t0}")
 
         return words
 

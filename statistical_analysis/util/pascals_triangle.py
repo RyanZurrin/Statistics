@@ -9,8 +9,12 @@ def pascals_triangle(n, display=True):
         return [[1]]
     else:
         result = [[1], [1, 1]]
-        for i in range(2, n):
-            result.append([1] + [result[i - 1][j] + result[i - 1][j + 1] for j in range(i - 1)] + [1])
+        result.extend(
+            [1]
+            + [result[i - 1][j] + result[i - 1][j + 1] for j in range(i - 1)]
+            + [1]
+            for i in range(2, n)
+        )
         if display:
             for row in result:
                 print('  ' * (n - len(row)), end='')

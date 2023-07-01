@@ -52,36 +52,20 @@ class Statify(object):
         elif isinstance(self._data, tuple):
             # return the mean of the values in the tuple
             return sum(self._data) / len(self._data)
-        # if it is a list of tuples
         elif isinstance(self._data, list) and isinstance(self._data[0], tuple):
-            # iterate through the list of tuples and sum the values
-            total = 0
-            for t in self._data:
-                total += sum(t)
+            total = sum(sum(t) for t in self._data)
             # return the mean of the values in the list of tuples
             return total / len(self._data)
-        # if it is a list of lists
         elif isinstance(self._data, list) and isinstance(self._data[0], list):
-            # iterate through the list of lists and sum the values
-            total = 0
-            for l in self._data:
-                total += sum(l)
+            total = sum(sum(l) for l in self._data)
             # return the mean of the values in the list of lists
             return total / len(self._data)
-        # if it is a list of dicts
         elif isinstance(self._data, list) and isinstance(self._data[0], dict):
-            # iterate through the list of dicts and sum the values
-            total = 0
-            for d in self._data:
-                total += sum(d.values())
+            total = sum(sum(d.values()) for d in self._data)
             # return the mean of the values in the list of dicts
             return total / len(self._data)
-        # if it is a list of sets
         elif isinstance(self._data, list) and isinstance(self._data[0], set):
-            # iterate through the list of sets and sum the values
-            total = 0
-            for s in self._data:
-                total += sum(s)
+            total = sum(sum(s) for s in self._data)
             # return the mean of the values in the list of sets
             return total / len(self._data)
         else:
@@ -98,7 +82,7 @@ class Statify(object):
     def weighted_mean(self, key=False, weights=[]):
         if isinstance(self._data, pd.DataFrame):
             return self._data[key].mean()
-        return sum([x * y for x, y in zip(self._data, weights)]) / sum(weights)
+        return sum(x * y for x, y in zip(self._data, weights)) / sum(weights)
 
     def median(self, key=False):
         if isinstance(self._data, pd.DataFrame):
@@ -162,10 +146,7 @@ class Statify(object):
         if isinstance(self._data, pd.DataFrame):
             return self._data[key].quantile(0.25)
         n = len(self._data)
-        if n % 2 == 0:
-            lower_half = self._data[:n // 2]
-        else:
-            lower_half = self._data[:n // 2 + 1]
+        lower_half = self._data[:n // 2] if n % 2 == 0 else self._data[:n // 2 + 1]
         return Statify(lower_half).median()
 
     def Q2(self, key=False):
@@ -317,16 +298,14 @@ class Statify(object):
         return Statify([x * y for x, y in zip(self._data, other.data)])
 
     def __truediv__(self, other):
-        if isinstance(other, Statify):
-            return Statify(
-                [x / y for x, y in zip(self._data, other.data)])
-        return Statify([x / y for x, y in zip(self._data, other.data)])
+        return Statify(
+            [x / y for x, y in zip(self._data, other.data)])
 
     def __repr__(self):
-        return "StatisticMethods({})".format(self._data)
+        return f"StatisticMethods({self._data})"
 
     def __str__(self):
-        return "StatisticMethods({})".format(self._data)
+        return f"StatisticMethods({self._data})"
 
     def __len__(self):
         return len(self._data)
